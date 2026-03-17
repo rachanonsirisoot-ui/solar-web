@@ -3,211 +3,240 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>⚡ Solar Engineering Ultimate Tool</title>
+    <title>⚡ Solar Engineering Ultimate Tool PRO</title>
     
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY"></script> <style>
+
+    <style>
         :root { --primary: #10b981; --danger: #ef4444; --warning: #f59e0b; --bg: #0f172a; --card: #1e293b; --text: #f1f5f9; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); padding: 20px; margin: 0; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); color: var(--text); padding: 20px; margin: 0; }
         .container { max-width: 1300px; margin: auto; }
+        
+        /* Layout */
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
-        .card { background: var(--card); padding: 20px; border-radius: 12px; border: 1px solid #334155; }
-        h2 { color: var(--primary); font-size: 1.1rem; margin-top: 0; border-bottom: 1px solid #334155; padding-bottom: 10px; }
+        .card { background: var(--card); padding: 20px; border-radius: 12px; border: 1px solid #334155; height: fit-content; }
+        h2 { color: var(--primary); font-size: 1.1rem; margin: 0 0 15px 0; display: flex; align-items: center; gap: 8px; }
         
-        .field { margin-bottom: 12px; }
-        .field label { display: block; font-size: 0.8rem; color: #94a3b8; margin-bottom: 4px; }
-        .input-group { display: flex; background: #0f172a; border-radius: 6px; border: 1px solid #475569; overflow: hidden; }
-        .input-group input { flex: 1; background: transparent; border: none; color: white; padding: 10px; outline: none; }
-        .input-group span { background: #334155; padding: 10px; font-size: 0.8rem; width: 60px; text-align: center; }
+        /* Form Elements */
+        .field { margin-bottom: 15px; }
+        label { display: block; font-size: 0.8rem; color: #94a3b8; margin-bottom: 5px; }
+        .input-group { display: flex; background: #0f172a; border-radius: 8px; border: 1px solid #475569; overflow: hidden; }
+        .input-group input { flex: 1; background: transparent; border: none; color: white; padding: 10px; outline: none; text-align: right; }
+        .input-group span { background: #334155; padding: 10px; font-size: 0.8rem; min-width: 60px; text-align: center; color: #94a3b8; }
 
-        #map { height: 300px; border-radius: 12px; margin-bottom: 20px; background: #242f3e; }
-        button { width: 100%; padding: 15px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 10px; }
-        .btn-calc { background: var(--primary); color: #064e3b; }
+        /* Map & Controls */
+        #map { height: 350px; border-radius: 12px; margin-bottom: 20px; border: 2px solid #334155; z-index: 1; }
+        .btn-run { background: var(--primary); color: #064e3b; width: 100%; padding: 18px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; font-size: 1.1rem; margin: 20px 0; transition: 0.3s; }
+        .btn-run:hover { filter: brightness(1.1); transform: translateY(-2px); }
+
+        /* Results Display */
+        #result-panel { font-family: 'Consolas', monospace; font-size: 0.95rem; line-height: 1.7; color: #5eead4; background: #020617; padding: 20px; border-radius: 12px; border-left: 5px solid var(--primary); }
+        .alert { color: var(--danger); font-weight: bold; animation: blink 1s infinite; }
+        @keyframes blink { 50% { opacity: 0.5; } }
         
-        .status-badge { padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; }
-        .bg-ok { background: #064e3b; color: #4ade80; }
-        .bg-err { background: #7f1d1d; color: #fca5a5; }
-
-        .result-panel { font-family: 'Consolas', monospace; font-size: 0.9rem; line-height: 1.6; color: #5eead4; }
-        .chart-container { position: relative; height: 300px; width: 100%; }
+        canvas { background: #fff; border-radius: 12px; padding: 15px; width: 100% !important; margin-top: 15px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>⚡ Solar Engineering <span style="color:var(--primary)">Ultimate Suite</span></h1>
+    <header style="text-align: center; margin-bottom: 30px;">
+        <h1>⚡ Solar Engineering <span style="color:var(--primary)">Ultimate Suite</span></h1>
+        <p style="color: #94a3b8;">Advanced Design, Safety Validation & Battery Simulation</p>
+    </header>
 
-    <div id="map">คลิกบนแผนที่เพื่อดึงพิกัด (ต้องใส่ Google Maps API Key)</div>
+    <div class="card" style="margin-bottom: 25px;">
+        <h2>📍 Site Selection (Click map to set location)</h2>
+        <div id="map"></div>
+    </div>
 
     <div class="grid">
         <div class="card">
             <h2>🌍 Site & Geo-Optima</h2>
-            <div class="field"><label>Latitude / Longitude</label>
-                <div class="field" style="display: flex; gap: 5px;">
-                    <input id="lat" value="13.75" style="flex:1; padding:8px; background:#0f172a; color:white; border:1px solid #475569;">
-                    <input id="lon" value="100.5" style="flex:1; padding:8px; background:#0f172a; color:white; border:1px solid #475569;">
+            <div class="field">
+                <label>Latitude / Longitude</label>
+                <div class="input-group">
+                    <input id="lat" value="13.7500" readonly>
+                    <input id="lon" value="100.5000" readonly>
                 </div>
             </div>
-            <div class="field"><label>Orientation (Azimuth)</label>
-                <div class="input-group"><input id="azi" value="180"><span>South°</span></div>
+            <div class="field">
+                <label>Selected Tilt / Azimuth (South=180)</label>
+                <div class="input-group">
+                    <input id="tilt" value="15"><span>°</span>
+                    <input id="azi" value="180"><span>°</span>
+                </div>
             </div>
-            <button onclick="optimizeTilt()" style="background:#334155; color:white; font-size:0.8rem; padding:8px;">Auto-Optimize Tilt</button>
-            <div class="field" style="margin-top:10px;"><label>Selected Tilt</label>
-                <div class="input-group"><input id="tilt" value="15"><span>Degree</span></div>
+            <button onclick="autoOptimize()" style="width:100%; padding:8px; background:#475569; color:white; border:none; border-radius:5px; cursor:pointer;">Auto-Optimize Tilt</button>
+        </div>
+
+        <div class="card">
+            <h2>☀️ Module & Inverter Safety</h2>
+            <div class="field">
+                <label>Panel Pmax / Voc / Isc</label>
+                <div class="input-group">
+                    <input id="pWp" value="550">
+                    <input id="pVoc" value="49.8">
+                    <input id="pIsc" value="13.9">
+                </div>
+            </div>
+            <div class="field">
+                <label>Panels Total / Panels per String</label>
+                <div class="input-group">
+                    <input id="pQty" value="40">
+                    <input id="pStr" value="10">
+                </div>
+            </div>
+            <div class="field">
+                <label>Inverter Max Voc / Max Isc</label>
+                <div class="input-group">
+                    <input id="invMaxV" value="1000"><span>V</span>
+                    <input id="invMaxI" value="15"><span>A</span>
+                </div>
             </div>
         </div>
 
         <div class="card">
-            <h2>☀️ Module Tech Specs</h2>
-            <div class="field"><label>Power / Voc / Isc</label>
-                <div style="display:flex; gap:5px;">
-                    <input id="pWp" value="550" placeholder="W" style="width:33%; padding:8px;">
-                    <input id="pVoc" value="49.8" placeholder="Voc" style="width:33%; padding:8px;">
-                    <input id="pIsc" value="13.9" placeholder="Isc" style="width:33%; padding:8px;">
+            <h2>🔋 Storage & Efficiency</h2>
+            <div class="field">
+                <label>Inverter Efficiency / Temp Coeff (Pmax)</label>
+                <div class="input-group">
+                    <input id="invEff" value="98"><span>%</span>
+                    <input id="pCoeff" value="-0.34"><span>%/°C</span>
                 </div>
             </div>
-            <div class="field"><label>Temp. Coeff of Pmax</label>
-                <div class="input-group"><input id="pCoeff" value="-0.34"><span>%/°C</span></div>
+            <div class="field">
+                <label>Battery Capacity (kWh)</label>
+                <div class="input-group"><input id="batKwh" value="15"><span>kWh</span></div>
             </div>
-            <div class="field"><label>Total Panels / Panels Per String</label>
-                <div style="display:flex; gap:5px;">
-                    <input id="pQty" value="40" style="flex:1; padding:8px;">
-                    <input id="pStr" value="10" style="flex:1; padding:8px;">
-                </div>
-            </div>
-        </div>
-
-        <div class="card">
-            <h2>🔋 Inverter & Battery (SOC)</h2>
-            <div class="field"><label>Inverter Max Voc / Max Isc (Per MPPT)</label>
-                <div style="display:flex; gap:5px;">
-                    <input id="invMaxV" value="1000" style="flex:1; padding:8px;">
-                    <input id="invMaxI" value="15" style="flex:1; padding:8px;">
-                </div>
-            </div>
-            <div class="field"><label>Battery Capacity / Peak Shaving Limit</label>
-                <div style="display:flex; gap:5px;">
-                    <input id="batKwh" value="15" style="flex:1; padding:8px;">
-                    <input id="shaveLimit" value="5" placeholder="kW" style="flex:1; padding:8px;">
-                </div>
-            </div>
-            <div class="field"><label>Inverter Efficiency</label>
-                <div class="input-group"><input id="invEff" value="98"><span>%</span></div>
+            <div class="field">
+                <label>Electricity Price</label>
+                <div class="input-group"><input id="ePrice" value="4.7"><span>฿/unit</span></div>
             </div>
         </div>
     </div>
 
-    <button class="btn-calc" onclick="runAnalysis()">⚡ RUN FULL SYSTEM ANALYSIS</button>
+    <button class="btn-run" onclick="runAnalysis()">⚡ EXECUTE FULL SYSTEM ANALYSIS</button>
 
-    <div class="grid" style="margin-top: 20px;">
+    <div class="grid">
         <div class="card">
-            <h2>📝 Loss Breakdown & PR</h2>
-            <div id="result" class="result-panel">รอผลการวิเคราะห์...</div>
+            <h2>📝 Engineering Breakdown</h2>
+            <div id="result-panel">Ready for calculation...</div>
         </div>
         <div class="card">
-            <h2>📈 Production vs Battery SOC</h2>
-            <div class="chart-container"><canvas id="mainChart"></canvas></div>
+            <h2>📈 Yield & SOC Analysis</h2>
+            <canvas id="yieldChart"></canvas>
         </div>
     </div>
 </div>
 
 <script>
-let chartInstance = null;
+let map, marker, chart;
 
-// 1. Google Maps Logic
+// 1. Initialize Map (Leaflet - FREE)
 function initMap() {
-    const map = new google.maps.Map(document.getElementById("map"), {
-        center: { lat: 13.75, lng: 100.5 },
-        zoom: 12,
-        styles: [{ "featureType": "all", "stylers": [{ "invert_lightness": true }] }] // Dark Map
-    });
-    map.addListener("click", (e) => {
-        document.getElementById("lat").value = e.latLng.lat().toFixed(4);
-        document.getElementById("lon").value = e.latLng.lng().toFixed(4);
+    map = L.map('map').setView([13.75, 100.5], 6);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+    
+    marker = L.marker([13.75, 100.5], {draggable: false}).addTo(map);
+
+    map.on('click', function(e) {
+        const {lat, lng} = e.latLng;
+        document.getElementById('lat').value = lat.toFixed(4);
+        document.getElementById('lon').value = lng.toFixed(4);
+        marker.setLatLng([lat, lng]);
     });
 }
 
-// 2. Auto-Optimize Tilt
-function optimizeTilt() {
-    const lat = Math.abs(parseFloat(document.getElementById("lat").value));
-    // Rule of thumb: Optimal tilt ≈ Latitude * 0.9
-    let optTilt = (lat * 0.9).toFixed(1);
-    document.getElementById("tilt").value = optTilt;
+// 2. Optimization Logic
+function autoOptimize() {
+    const lat = Math.abs(parseFloat(document.getElementById('lat').value));
+    document.getElementById('tilt').value = (lat * 0.9).toFixed(1);
 }
 
-// 3. Main Analysis
+// 3. Main Engineering Analysis
 async function runAnalysis() {
-    const v = (id) => parseFloat(document.getElementById(id).value);
+    const val = (id) => parseFloat(document.getElementById(id).value);
     
-    // Safety Check (Inverter Protection)
-    const stringVoc = v('pVoc') * v('pStr');
-    const stringIsc = v('pIsc');
-    const isSafeV = stringVoc <= v('invMaxV');
-    const isSafeI = stringIsc <= v('invMaxI');
+    // Safety Validation
+    const stringVoc = val('pVoc') * val('pStr');
+    const stringIsc = val('pIsc');
+    const isSafeV = stringVoc <= val('invMaxV');
+    const isSafeI = stringIsc <= val('invMaxI');
 
-    // Energy Calculation with Temp Effect
-    const avgCellTemp = 50; // °C in TH
-    const tempLoss = Math.abs((avgCellTemp - 25) * v('pCoeff')) / 100;
-    const systemKWp = (v('pWp') * v('pQty')) / 1000;
+    // Technical Losses
+    const cellTemp = 55; // Average cell temp in Thailand
+    const tempLoss = (cellTemp - 25) * Math.abs(val('pCoeff')) / 100;
+    const invLoss = (100 - val('invEff')) / 100;
+    const miscLoss = 0.05; // Soiling, Cable, Mismatch
+    const totalPR = (1 - tempLoss) * (1 - invLoss) * (1 - miscLoss);
+
+    const systemSize = (val('pWp') * val('pQty')) / 1000;
     
-    let monthlyGen = [];
+    // Monthly Calculation (HSP Data - Average Thailand)
+    const hspData = [5.1, 5.5, 5.9, 6.2, 5.4, 5.0, 4.8, 4.7, 4.6, 5.0, 5.1, 5.1];
+    let monthlyKwh = [];
     let yearlySum = 0;
-    const hspThai = [5.1, 5.5, 5.8, 6.1, 5.3, 4.9, 4.8, 4.7, 4.6, 5.0, 5.1, 5.1]; // Monthly HSP Thailand
+    let socData = [];
 
-    hspThai.forEach((hsp, i) => {
-        const days = new Date(2024, i+1, 0).getDate();
-        // Calculation: Area * HSP * (1-Losses)
-        let pr = (1 - tempLoss) * (v('invEff')/100) * 0.95; // 0.95 is Soiling/Cable loss
-        let energy = hsp * systemKWp * pr * days;
-        monthlyGen.push(energy.toFixed(0));
+    hspData.forEach((hsp, i) => {
+        const days = new Date(2026, i + 1, 0).getDate();
+        const energy = hsp * systemSize * totalPR * days;
+        monthlyKwh.push(energy.toFixed(1));
         yearlySum += energy;
+        
+        // Battery SOC Sim (Simplified: Excess energy storage simulation)
+        const dailyGen = energy / days;
+        const estimatedLoad = systemSize * 2.5; // Assumption of load
+        const excess = Math.max(0, dailyGen - estimatedLoad);
+        const soc = Math.min(100, (excess / val('batKwh')) * 100);
+        socData.push(soc.toFixed(1));
     });
 
-    // PR Calculation
-    const totalPR = ((1 - tempLoss) * (v('invEff')/100) * 0.95 * 100).toFixed(1);
+    const yearlySaving = yearlySum * val('ePrice');
 
-    // Battery SOC Simulation (Peak Shaving Simple Model)
-    let socData = monthlyGen.map(m => {
-        let daily = m / 30;
-        return Math.min(100, (daily / v('batKwh')) * 100).toFixed(1);
-    });
-
-    // Display Results
-    document.getElementById('result').innerHTML = `
-        <b>🛡️ Inverter Safety:</b><br>
-        • Voc: ${stringVoc.toFixed(1)}V / Max ${v('invMaxV')}V [${isSafeV ? '✅ PASS' : '❌ FAIL'}]<br>
-        • Isc: ${stringIsc.toFixed(1)}A / Max ${v('invMaxI')}A [${isSafeI ? '✅ PASS' : '❌ FAIL'}]<br>
-        <br><b>📉 Loss Breakdown:</b><br>
-        • Temp Loss (-${(tempLoss*100).toFixed(1)}%) : Thermal effect<br>
-        • Inverter Loss (-${(100-v('invEff')).toFixed(1)}%) : DC-AC Conversion<br>
-        • Other Losses (-5.0%) : Dust, Cable, Mismatch<br>
-        <br><b>✨ Performance Ratio (PR): ${totalPR}%</b><br>
-        • Yearly Production: ${yearlySum.toLocaleString()} kWh/y<br>
-        • Peak Shaving Est: ${v('shaveLimit')} kW Capability
+    // Render Text Results
+    document.getElementById('result-panel').innerHTML = `
+        <b>🛡️ Inverter Safety Check:</b><br>
+        • Voc String: ${stringVoc.toFixed(1)}V / Max ${val('invMaxV')}V 
+          [${isSafeV ? '<span style="color:var(--primary)">PASSED</span>' : '<span class="alert">DANGER: OVERVOLT</span>'}]<br>
+        • Isc String: ${stringIsc.toFixed(1)}A / Max ${val('invMaxI')}A 
+          [${isSafeI ? '<span style="color:var(--primary)">PASSED</span>' : '<span class="alert">DANGER: OVERCURRENT</span>'}]<br>
+        <hr style="border:0; border-top:1px solid #334155; margin:10px 0;">
+        <b>⚙️ Performance Metrics:</b><br>
+        • System Capacity: ${systemSize.toFixed(2)} kWp<br>
+        • Performance Ratio (PR): ${(totalPR * 100).toFixed(1)} %<br>
+        • Thermal Loss: -${(tempLoss * 100).toFixed(1)} %<br>
+        <hr style="border:0; border-top:1px solid #334155; margin:10px 0;">
+        <b>💰 Economic Impact:</b><br>
+        • Annual Energy: ${yearlySum.toLocaleString(undefined, {maximumFractionDigits:0})} kWh/year<br>
+        • Est. Saving: ${yearlySaving.toLocaleString(undefined, {maximumFractionDigits:0})} THB/year<br>
+        • CO2 Reduction: ${(yearlySum * 0.51 / 1000).toFixed(2)} Tons/year
     `;
 
-    renderChart(monthlyGen, socData);
+    updateChart(monthlyKwh, socData);
 }
 
-function renderChart(gen, soc) {
-    const ctx = document.getElementById('mainChart').getContext('2d');
-    if (chartInstance) chartInstance.destroy();
-    chartInstance = new Chart(ctx, {
+function updateChart(yieldData, socData) {
+    const ctx = document.getElementById('yieldChart').getContext('2d');
+    if (chart) chart.destroy();
+    chart = new Chart(ctx, {
         type: 'line',
         data: {
             labels: ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
             datasets: [
-                { label: 'Energy Gen (kWh)', data: gen, borderColor: '#10b981', yAxisID: 'y' },
-                { label: 'Avg SOC (%)', data: soc, borderColor: '#6366f1', borderDash: [5, 5], yAxisID: 'y1' }
+                { label: 'Energy Yield (kWh)', data: yieldData, borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.1)', fill: true, yAxisID: 'y' },
+                { label: 'Battery SOC (%)', data: socData, borderColor: '#6366f1', borderDash: [5, 5], yAxisID: 'y1' }
             ]
         },
         options: {
             responsive: true,
-            maintainAspectRatio: false,
             scales: {
-                y: { type: 'linear', position: 'left' },
-                y1: { type: 'linear', position: 'right', grid: { drawOnChartArea: false }, max: 100 }
+                y: { type: 'linear', position: 'left', title: { display: true, text: 'kWh' } },
+                y1: { type: 'linear', position: 'right', max: 100, min: 0, title: { display: true, text: 'SOC %' }, grid: { drawOnChartArea: false } }
             }
         }
     });
