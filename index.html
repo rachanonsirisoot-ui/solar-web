@@ -3,181 +3,255 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>⚡ Solar Pro Tool | Engineering Suite</title>
+    <title>⚡ Solar Engineering Professional Suite</title>
+    
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+
     <style>
-        :root { --primary: #22c55e; --bg: #0f172a; --card: #1e293b; --text: #f8fafc; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; }
-        .container { max-width: 1100px; margin: auto; }
-        .header { text-align: center; margin-bottom: 30px; }
-        .grid-layout { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
-        .box { background: var(--card); padding: 20px; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border: 1px solid #334155; }
-        h2 { font-size: 1.1rem; color: var(--primary); margin-top: 0; display: flex; align-items: center; gap: 8px; }
-        .input-row { display: flex; align-items: center; margin-bottom: 12px; background: #334155; border-radius: 8px; overflow: hidden; }
-        .input-row label { flex: 2; padding-left: 12px; font-size: 0.85rem; color: #cbd5e1; }
-        .input-row input, .input-row select { flex: 1; padding: 10px; border: none; background: #475569; color: white; text-align: right; outline: none; }
-        .input-row span { flex: 0.5; padding: 10px; font-size: 0.8rem; background: #1e293b; text-align: center; }
-        .actions { margin: 25px 0; display: grid; grid-template-columns: 2fr 1fr; gap: 10px; }
-        button { padding: 15px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        .btn-run { background: var(--primary); color: #064e3b; }
-        .btn-pdf { background: #6366f1; color: white; }
-        button:hover { opacity: 0.9; transform: translateY(-2px); }
-        #result-display { background: #020617; padding: 20px; border-radius: 12px; border-left: 4px solid var(--primary); font-family: 'Consolas', monospace; margin-bottom: 20px; line-height: 1.8; }
-        .status-ok { color: #4ade80; } .status-warn { color: #fbbf24; } .status-danger { color: #ef4444; }
-        canvas { background: #fff; border-radius: 12px; padding: 15px; width: 100% !important; }
+        :root {
+            --primary: #10b981;
+            --secondary: #6366f1;
+            --bg: #0f172a;
+            --card: #1e293b;
+            --danger: #ef4444;
+            --text: #f1f5f9;
+        }
+
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; }
+        .container { max-width: 1200px; margin: auto; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 20px; }
+        
+        /* UI Elements */
+        .card { background: var(--card); padding: 25px; border-radius: 16px; border: 1px solid #334155; height: fit-content; }
+        h1, h2 { margin-top: 0; display: flex; align-items: center; gap: 10px; }
+        h1 { color: var(--primary); font-size: 1.8rem; }
+        h2 { font-size: 1.1rem; color: #94a3b8; border-bottom: 1px solid #334155; padding-bottom: 10px; }
+
+        .input-group { display: flex; flex-direction: column; margin-bottom: 15px; }
+        .input-group label { font-size: 0.85rem; margin-bottom: 5px; color: #94a3b8; }
+        .field { display: flex; background: #0f172a; border-radius: 8px; overflow: hidden; border: 1px solid #475569; }
+        .field input, .field select { flex: 1; background: transparent; border: none; color: white; padding: 10px; outline: none; }
+        .field span { background: #334155; padding: 10px; font-size: 0.8rem; min-width: 60px; text-align: center; }
+
+        /* Buttons */
+        .btn-group { grid-column: 1 / -1; display: flex; gap: 10px; margin: 20px 0; }
+        button { flex: 1; padding: 15px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; font-size: 1rem; }
+        .btn-calc { background: var(--primary); color: #064e3b; }
+        .btn-pdf { background: var(--secondary); color: white; }
+        button:hover { opacity: 0.8; transform: translateY(-2px); }
+
+        /* Results & Tables */
+        #result-box { white-space: pre-wrap; font-family: 'Courier New', monospace; line-height: 1.6; color: #a5f3fc; }
+        .table-container { margin-top: 20px; overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; background: #0f172a; border-radius: 8px; font-size: 0.9rem; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #334155; }
+        th { background: #334155; color: var(--primary); }
+
+        .warning { color: var(--danger); font-weight: bold; }
+        canvas { background: white; border-radius: 12px; margin-top: 20px; padding: 10px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="header">
-        <h1>⚡ Solar Engineering <span style="color:var(--primary)">PRO++</span></h1>
-        <p>Advanced Design & Simulation Suite v3.0</p>
-    </div>
+    <h1>⚡ Solar Pro Engineering Suite <small style="font-size: 10px; color: grey;">v4.0 Complete</small></h1>
 
-    <div class="grid-layout">
-        <div class="box">
-            <h2>🌍 Site & Panel Data</h2>
-            <div class="input-row"><label>Latitude</label><input id="lat" value="13.75"><span>°N</span></div>
-            <div class="input-row"><label>Longitude</label><input id="lon" value="100.5"><span>°E</span></div>
-            <div class="input-row"><label>Panel Wattage</label><input id="pWp" value="550"><span>W</span></div>
-            <div class="input-row"><label>Open Circuit (Voc)</label><input id="pVoc" value="49.8"><span>V</span></div>
-            <div class="input-row"><label>Short Circuit (Isc)</label><input id="pIsc" value="13.9"><span>A</span></div>
-        </div>
-
-        <div class="box">
-            <h2>⚙️ System Configuration</h2>
-            <div class="input-row"><label>Total Panels</label><input id="pQty" value="20"><span>Pcs</span></div>
-            <div class="input-row"><label>Panels per String</label><input id="pStr" value="10"><span>S</span></div>
-            <div class="input-row"><label>Roof Tilt</label><input id="tilt" value="15"><span>°</span></div>
-            <div class="input-row"><label>Azimuth (South=180)</label><input id="azi" value="180"><span>°</span></div>
-            <div class="input-row">
-                <label>System Loss</label>
-                <select id="lossLevel">
-                    <option value="0.15">Low (15%)</option>
-                    <option value="0.20" selected>Standard (20%)</option>
-                    <option value="0.25">High (25%)</option>
-                </select>
+    <div class="grid">
+        <div class="card">
+            <h2>☀️ PV Module & Array</h2>
+            <div class="input-group">
+                <label>แผงที่ใช้ (Watt Peak)</label>
+                <div class="field"><input id="pWp" value="550"><span>Wp</span></div>
+            </div>
+            <div class="grid" style="grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div class="input-group"><label>Voc (V)</label><div class="field"><input id="pVoc" value="49.8"></div></div>
+                <div class="input-group"><label>Isc (A)</label><div class="field"><input id="pIsc" value="13.9"></div></div>
+            </div>
+            <div class="input-group">
+                <label>จำนวนแผงทั้งหมด</label>
+                <div class="field"><input id="pQty" value="36"><span>แผง</span></div>
+            </div>
+            <div class="input-group">
+                <label>จำนวนแผงต่อ String</label>
+                <div class="field"><input id="pStr" value="18"><span>Series</span></div>
             </div>
         </div>
 
-        <div class="box">
-            <h2>💰 Finance & Battery</h2>
-            <div class="input-row"><label>Electricity Cost</label><input id="ePrice" value="4.7"><span>฿</span></div>
-            <div class="input-row"><label>Project Cost</label><input id="cost" value="350000"><span>฿</span></div>
-            <div class="input-row"><label>Battery Req.</label><input id="batKwh" value="10"><span>kWh</span></div>
-            <div class="input-row"><label>Inverter Eff.</label><input id="invEff" value="97"><span>%</span></div>
+        <div class="card">
+            <h2>🌍 Site Location & Loss</h2>
+            <div class="grid" style="grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div class="input-group"><label>Latitude</label><div class="field"><input id="lat" value="13.75"></div></div>
+                <div class="input-group"><label>Longitude</label><div class="field"><input id="lon" value="100.5"></div></div>
+            </div>
+            <div class="input-group">
+                <label>มุมเอียง (Tilt Angle)</label>
+                <div class="field"><input id="tilt" value="15"><span>องศา</span></div>
+            </div>
+            <div class="input-group">
+                <label>ทิศทาง (South=180, East=90)</label>
+                <div class="field"><input id="azi" value="180"><span>องศา</span></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>💰 Investment & Tariff</h2>
+            <div class="input-group">
+                <label>ค่าไฟฟ้า (เฉลี่ย)</label>
+                <div class="field"><input id="ePrice" value="4.7"><span>฿/หน่วย</span></div>
+            </div>
+            <div class="input-group">
+                <label>งบประมาณโครงการ</label>
+                <div class="field"><input id="cost" value="450000"><span>บาท</span></div>
+            </div>
+            <div class="input-group">
+                <label>Inverter Efficiency</label>
+                <div class="field"><input id="invEff" value="97.5"><span>%</span></div>
+            </div>
         </div>
     </div>
 
-    <div class="actions">
-        <button class="btn-run" onclick="runSimulation()">⚡ RUN FULL SIMULATION</button>
-        <button class="btn-pdf" onclick="exportReport()">📄 PDF REPORT</button>
+    <div class="btn-group">
+        <button class="btn-calc" onclick="calculateAll()">⚡ RUN SIMULATION & GENERATE BOM</button>
+        <button class="btn-pdf" onclick="generatePDF()">📄 EXPORT PROFESSIONAL REPORT</button>
     </div>
 
-    <div id="result-display">ผลการคำนวณจะแสดงที่นี่...</div>
+    <div class="grid">
+        <div class="card">
+            <h2>📊 Production Summary</h2>
+            <div id="result-box">ยังไม่มีการคำนวณ...</div>
+        </div>
+        <div class="card">
+            <h2>📦 Bill of Materials (Estimated)</h2>
+            <div id="bom-table" class="table-container"></div>
+        </div>
+    </div>
 
-    <div class="box">
-        <canvas id="energyChart"></canvas>
+    <div class="card" style="margin-top: 20px;">
+        <h2>📈 Monthly Energy Yield (kWh)</h2>
+        <canvas id="yieldChart" height="100"></canvas>
     </div>
 </div>
 
 <script>
-let solarChart = null;
+let chartObj = null;
+let lastCalcData = {};
 
-async function runSimulation() {
-    const getV = (id) => parseFloat(document.getElementById(id).value);
+async function calculateAll() {
+    const val = (id) => parseFloat(document.getElementById(id).value);
     
-    // ดึงค่า Input
-    const lat = getV('lat'), lon = getV('lon');
-    const pWp = getV('pWp'), pQty = getV('pQty'), pVoc = getV('pVoc'), pIsc = getV('pIsc');
-    const pStr = getV('pStr'), tilt = getV('tilt'), azi = getV('azi');
-    const ePrice = getV('ePrice'), cost = getV('cost'), loss = getV('lossLevel');
+    // Inputs
+    const pWp = val('pWp'), pQty = val('pQty'), pVoc = val('pVoc'), pStr = val('pStr');
+    const lat = val('lat'), lon = val('lon'), tilt = val('tilt'), azi = val('azi');
+    const ePrice = val('ePrice'), cost = val('cost'), invEff = val('invEff')/100;
+
+    // 1. Validation
+    if (pQty % pStr !== 0) {
+        alert("⚠️ จำนวนแผงทั้งหมดต้องหารด้วยจำนวนแผงต่อ String ลงตัว!");
+        return;
+    }
 
     try {
-        // 1. ดึงข้อมูล NASA (Monthly Climatology)
-        const response = await fetch(`https://power.larc.nasa.gov/api/temporal/monthly/point?parameters=ALLSKY_SFC_SW_DWN&community=RE&longitude=${lon}&latitude=${lat}&format=JSON`);
-        const data = await response.json();
-        const solarRaw = data.properties.parameter.ALLSKY_SFC_SW_DWN;
+        // 2. NASA API
+        const res = await fetch(`https://power.larc.nasa.gov/api/temporal/monthly/point?parameters=ALLSKY_SFC_SW_DWN&community=RE&longitude=${lon}&latitude=${lat}&format=JSON`);
+        const data = await res.json();
+        const solarData = data.properties.parameter.ALLSKY_SFC_SW_DWN;
 
-        // 2. Logic การคำนวณวิศวกรรม
-        const systemSizeKW = (pWp * pQty) / 1000;
+        // 3. Calculation Logic
+        const systemKWp = (pWp * pQty) / 1000;
         const stringVoc = pVoc * pStr;
-        const totalStrings = pQty / pStr;
+        const lossFactor = 0.18; // Default system loss (Dust, Temp, Cable)
         
-        // Orientation Factor (Simple Model)
-        const aziRad = (azi - 180) * (Math.PI / 180);
-        const orientationEff = Math.cos(aziRad) * 0.98; // ลดทอนถ้าไม่หันใต้
+        let monthlyYield = [];
+        let totalYearly = 0;
+        const labels = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 
-        let monthlyGen = [];
-        let yearlyTotal = 0;
-        const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-
-        Object.values(solarRaw).slice(0, 12).forEach((hsp, i) => {
+        Object.values(solarData).slice(0, 12).forEach((hsp, i) => {
             const days = new Date(2024, i+1, 0).getDate();
-            const energy = hsp * systemSizeKW * (1 - loss) * orientationEff * days;
-            monthlyGen.push(energy.toFixed(1));
-            yearlyTotal += energy;
+            // Energy = HSP * kWp * SystemEff * OrientationEff
+            const energy = hsp * systemKWp * (1 - lossFactor) * invEff * days;
+            monthlyYield.push(energy.toFixed(0));
+            totalYearly += energy;
         });
 
-        const yearlySaving = yearlyTotal * ePrice;
-        const roi = cost / yearlySaving;
+        const yearlySaving = totalYearly * ePrice;
+        const payback = cost / yearlySaving;
 
-        // 3. แสดงผลลัพธ์
-        const vocStatus = stringVoc > 1000 ? '<span class="status-danger">⚠️ Danger (Over 1000V)</span>' : '<span class="status-ok">✔️ Safe</span>';
+        // 4. Update UI
+        document.getElementById('result-box').innerHTML = 
+            `System Size:    ${systemKWp.toFixed(2)} kWp\n` +
+            `Total Yield:    ${totalYearly.toLocaleString()} kWh/Year\n` +
+            `String Voc:     ${stringVoc.toFixed(1)} V ${stringVoc > 1000 ? '<span class="warning">!! HIGH VOLTAGE !!</span>' : '(Safe)'}\n` +
+            `Saving:         ${yearlySaving.toLocaleString()} THB/Year\n` +
+            `Payback:        ${payback.toFixed(1)} Years\n` +
+            `CO2 Reduced:    ${(totalYearly * 0.0005).toFixed(2)} Tons/Year`;
+
+        renderBOM(systemKWp, pQty);
+        renderChart(labels, monthlyYield);
         
-        document.getElementById('result-display').innerHTML = `
-            <strong>📊 System Summary:</strong><br>
-            • System Size: ${systemSizeKW.toFixed(2)} kWp<br>
-            • Estimated Yield: ${yearlyTotal.toLocaleString()} kWh/year<br>
-            • Monthly Avg: ${(yearlyTotal/12).toLocaleString()} kWh/month<br>
-            • String Voltage (Voc): ${stringVoc.toFixed(1)} V ${vocStatus}<br>
-            • Max String Current: ${(pIsc * totalStrings).toFixed(2)} A<br>
-            <hr style="border:0; border-top:1px solid #334155">
-            <strong>💰 Financial Analysis:</strong><br>
-            • Annual Saving: ${yearlySaving.toLocaleString()} THB<br>
-            • Payback Period: ${roi.toFixed(1)} Years<br>
-            • ROI: ${((yearlySaving/cost)*100).toFixed(1)} % / Year
-        `;
+        lastCalcData = { systemKWp, totalYearly, yearlySaving, payback, monthlyYield };
 
-        // 4. วาดกราฟ
-        updateChart(months, monthlyGen);
-
-    } catch (error) {
-        console.error(error);
-        alert("เกิดข้อผิดพลาดในการดึงข้อมูลจาก NASA");
+    } catch (e) {
+        alert("Error: ไม่สามารถเชื่อมต่อฐานข้อมูลแสงอาทิตย์ได้");
     }
 }
 
-function updateChart(labels, data) {
-    const ctx = document.getElementById('energyChart').getContext('2d');
-    if (solarChart) solarChart.destroy();
-    solarChart = new Chart(ctx, {
-        type: 'bar',
+function renderBOM(kw, qty) {
+    const table = `
+        <table>
+            <tr><th>Item</th><th>Qty</th><th>Unit</th></tr>
+            <tr><td>PV Module (Tier 1)</td><td>${qty}</td><td>Pcs</td></tr>
+            <tr><td>On-Grid Inverter</td><td>1</td><td>Set</td></tr>
+            <tr><td>Mounting Structure</td><td>1</td><td>Lot</td></tr>
+            <tr><td>Electrical AC/DC Box</td><td>1</td><td>Set</td></tr>
+            <tr><td>Smart Meter + CT</td><td>1</td><td>Set</td></tr>
+        </table>`;
+    document.getElementById('bom-table').innerHTML = table;
+}
+
+function renderChart(labels, data) {
+    const ctx = document.getElementById('yieldChart').getContext('2d');
+    if (chartObj) chartObj.destroy();
+    chartObj = new Chart(ctx, {
+        type: 'line',
         data: {
             labels: labels,
             datasets: [{
-                label: 'Monthly Production (kWh)',
+                label: 'Monthly kWh',
                 data: data,
-                backgroundColor: '#22c55e',
-                borderRadius: 5
+                borderColor: '#10b981',
+                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                fill: true,
+                tension: 0.4
             }]
         },
-        options: {
-            responsive: true,
-            plugins: { legend: { display: false } },
-            scales: { y: { beginAtZero: true, grid: { color: '#f1f5f9' } } }
-        }
+        options: { responsive: true, scales: { y: { beginAtZero: true } } }
     });
 }
 
-function exportReport() {
+function generatePDF() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
-    doc.text("Solar Engineering Report", 20, 20);
-    doc.text(document.getElementById('result-display').innerText, 20, 40);
-    doc.save("Solar-Report.pdf");
+    
+    doc.setFontSize(22);
+    doc.setTextColor(16, 185, 129);
+    doc.text("Solar Project Engineering Report", 20, 20);
+    
+    doc.setFontSize(12);
+    doc.setTextColor(0, 0, 0);
+    doc.text(`System Capacity: ${lastCalcData.systemKWp} kWp`, 20, 40);
+    doc.text(`Annual Energy Production: ${lastCalcData.totalYearly.toFixed(0)} kWh`, 20, 50);
+    doc.text(`Estimated Payback: ${lastCalcData.payback.toFixed(1)} years`, 20, 60);
+    
+    // Add Table
+    doc.autoTable({
+        startY: 70,
+        head: [['Month', 'Energy Yield (kWh)']],
+        body: lastCalcData.monthlyYield.map((v, i) => [ (i+1).toString(), v]),
+    });
+
+    doc.save("Solar_Professional_Report.pdf");
 }
 </script>
 
