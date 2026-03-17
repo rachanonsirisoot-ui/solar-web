@@ -1,90 +1,70 @@
-<!DOCTYPE html>
-<html lang="th">
-<head>
-<meta charset="UTF-8">
-<title>⚡ Solar System Design</title>
-
-<style>
-body {
-    font-family: Arial;
-    background: #0f172a;
-    color: white;
-    text-align: center;
-    padding: 40px;
-}
-.box {
-    background: #1e293b;
-    padding: 20px;
-    border-radius: 12px;
-    max-width: 450px;
-    margin: auto;
-}
-input {
-    margin: 5px;
-    padding: 8px;
-    width: 90%;
-}
-button {
-    padding: 10px;
-    background: #22c55e;
-    border: none;
-    color: white;
-    cursor: pointer;
-}
-</style>
-</head>
-
-<body>
-
-<h1>⚡ Solar System Design Calculator</h1>
-
-<div class="box">
-
-<input type="number" id="load" placeholder="โหลดไฟ (kWh/วัน)">
-<input type="number" id="sun" placeholder="ค่าแดด (Peak Sun Hour)">
-<input type="number" id="panel" placeholder="กำลังแผง (W)">
-<input type="number" id="price" placeholder="ค่าไฟ (บาท/kWh)">
-<input type="number" id="cost" placeholder="ค่าติดตั้ง (บาท)">
-
-<br>
-<button onclick="calc()">คำนวณ</button>
-
-<h2 id="result"></h2>
-
-</div>
-
-<script>
 function calc() {
 
+// ===== INPUT =====
 let load = document.getElementById("load").value;
 let sun = document.getElementById("sun").value;
 let panel = document.getElementById("panel").value;
 let price = document.getElementById("price").value;
 let cost = document.getElementById("cost").value;
 
-// ขนาดระบบ (kW)
-let systemKW = load / sun;
+let voltage = document.getElementById("voltage").value;
+let backup = document.getElementById("backup").value;
+let dod = document.getElementById("dod").value / 100;
 
-// จำนวนแผง
+let distance = document.getElementById("distance").value;
+let stringSize = document.getElementById("stringSize").value;
+let eff = document.getElementById("eff").value / 100;
+
+let systemType = document.getElementById("systemType").value;
+
+// ===== SOLAR =====
+let systemKW = (load / sun) / eff;
 let panels = (systemKW * 1000) / panel;
+let strings = panels / stringSize;
 
-// พลังงานต่อปี
+// ===== BATTERY =====
+let batteryAh = (load * 1000 * backup) / (voltage * dod);
+let batteryCount = batteryAh / 100; // สมมุติแบต 100Ah
+
+// ===== INVERTER =====
+let inverterKW = systemKW * 1.2;
+let acCurrent = (inverterKW * 1000) / 230;
+
+// ===== CABLE =====
+let vdropDC = voltage * 0.03;
+let dcCurrent = (systemKW * 1000) / voltage;
+let dcCable = (2 * distance * dcCurrent) / (56 * vdropDC);
+
+let vdropAC = 230 * 0.03;
+let acCable = (2 * distance * acCurrent) / (56 * vdropAC);
+
+// ===== FINANCE =====
 let yearly = load * 365;
-
-// เงินที่ประหยัดได้/ปี
 let saving = yearly * price;
-
-// ROI (ปี)
 let roi = cost / saving;
 
+// ===== RESULT =====
 document.getElementById("result").innerHTML =
-"🔋 ขนาดระบบ: " + systemKW.toFixed(2) + " kW<br>" +
-"☀️ จำนวนแผง: " + Math.ceil(panels) + " แผง<br>" +
-"⚡ พลังงาน/ปี: " + yearly.toFixed(0) + " kWh<br>" +
-"💰 ประหยัด/ปี: " + saving.toFixed(0) + " บาท<br>" +
-"📈 คืนทุน: " + roi.toFixed(1) + " ปี";
-}
-</script>
+"☀️ ระบบ: " + systemType + "<br><br>" +
 
-</body>
-</html>
+"🔋 Solar<br>" +
+"ขนาด: " + systemKW.toFixed(2) + " kW<br>" +
+"จำนวนแผง: " + Math.ceil(panels) + "<br>" +
+"String: " + Math.ceil(strings) + "<br><br>" +
+
+"🔋 Battery<br>" +
+"ความจุ: " + batteryAh.toFixed(0) + " Ah<br>" +
+"จำนวนแบต (100Ah): " + Math.ceil(batteryCount) + "<br><br>" +
+
+"⚡ Inverter<br>" +
+"ขนาด: " + inverterKW.toFixed(2) + " kW<br>" +
+"กระแส AC: " + acCurrent.toFixed(2) + " A<br><br>" +
+
+"🔌 Cable<br>" +
+"DC: " + dcCable.toFixed(2) + " sq.mm<br>" +
+"AC: " + acCable.toFixed(2) + " sq.mm<br><br>" +
+
+"💰 Financial<br>" +
+"ประหยัด/ปี: " + saving.toFixed(0) + " บาท<br>" +
+"คืนทุน: " + roi.toFixed(1) + " ปี";
+}
