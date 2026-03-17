@@ -1,171 +1,184 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>⚡ Solar Pro Tool</title>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
-<style>
-body { font-family: Arial; background:#0f172a; color:white; padding:15px;}
-.container { max-width:900px; margin:auto;}
-.box { background:#1e293b; padding:15px; border-radius:12px; margin-bottom:10px;}
-.input-group { display:flex; margin:5px 0;}
-.input-group input, select { flex:1; padding:10px; border:none;}
-.input-group span { background:#334155; padding:10px;}
-button { width:100%; padding:12px; background:#22c55e; border:none; color:white; margin-top:5px;}
-canvas { background:white; border-radius:10px;}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚡ Solar Pro Tool | Engineering Suite</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        :root { --primary: #22c55e; --bg: #0f172a; --card: #1e293b; --text: #f8fafc; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; }
+        .container { max-width: 1100px; margin: auto; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .grid-layout { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
+        .box { background: var(--card); padding: 20px; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border: 1px solid #334155; }
+        h2 { font-size: 1.1rem; color: var(--primary); margin-top: 0; display: flex; align-items: center; gap: 8px; }
+        .input-row { display: flex; align-items: center; margin-bottom: 12px; background: #334155; border-radius: 8px; overflow: hidden; }
+        .input-row label { flex: 2; padding-left: 12px; font-size: 0.85rem; color: #cbd5e1; }
+        .input-row input, .input-row select { flex: 1; padding: 10px; border: none; background: #475569; color: white; text-align: right; outline: none; }
+        .input-row span { flex: 0.5; padding: 10px; font-size: 0.8rem; background: #1e293b; text-align: center; }
+        .actions { margin: 25px 0; display: grid; grid-template-columns: 2fr 1fr; gap: 10px; }
+        button { padding: 15px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .btn-run { background: var(--primary); color: #064e3b; }
+        .btn-pdf { background: #6366f1; color: white; }
+        button:hover { opacity: 0.9; transform: translateY(-2px); }
+        #result-display { background: #020617; padding: 20px; border-radius: 12px; border-left: 4px solid var(--primary); font-family: 'Consolas', monospace; margin-bottom: 20px; line-height: 1.8; }
+        .status-ok { color: #4ade80; } .status-warn { color: #fbbf24; } .status-danger { color: #ef4444; }
+        canvas { background: #fff; border-radius: 12px; padding: 15px; width: 100% !important; }
+    </style>
 </head>
-
 <body>
+
 <div class="container">
+    <div class="header">
+        <h1>⚡ Solar Engineering <span style="color:var(--primary)">PRO++</span></h1>
+        <p>Advanced Design & Simulation Suite v3.0</p>
+    </div>
 
-<h1>⚡ Solar Engineering Tool PRO++</h1>
+    <div class="grid-layout">
+        <div class="box">
+            <h2>🌍 Site & Panel Data</h2>
+            <div class="input-row"><label>Latitude</label><input id="lat" value="13.75"><span>°N</span></div>
+            <div class="input-row"><label>Longitude</label><input id="lon" value="100.5"><span>°E</span></div>
+            <div class="input-row"><label>Panel Wattage</label><input id="pWp" value="550"><span>W</span></div>
+            <div class="input-row"><label>Open Circuit (Voc)</label><input id="pVoc" value="49.8"><span>V</span></div>
+            <div class="input-row"><label>Short Circuit (Isc)</label><input id="pIsc" value="13.9"><span>A</span></div>
+        </div>
 
-<div class="box">
-<h2>🌍 Location</h2>
-<div class="input-group"><input id="lat" placeholder="Latitude"><span>°</span></div>
-<div class="input-group"><input id="lon" placeholder="Longitude"><span>°</span></div>
-</div>
+        <div class="box">
+            <h2>⚙️ System Configuration</h2>
+            <div class="input-row"><label>Total Panels</label><input id="pQty" value="20"><span>Pcs</span></div>
+            <div class="input-row"><label>Panels per String</label><input id="pStr" value="10"><span>S</span></div>
+            <div class="input-row"><label>Roof Tilt</label><input id="tilt" value="15"><span>°</span></div>
+            <div class="input-row"><label>Azimuth (South=180)</label><input id="azi" value="180"><span>°</span></div>
+            <div class="input-row">
+                <label>System Loss</label>
+                <select id="lossLevel">
+                    <option value="0.15">Low (15%)</option>
+                    <option value="0.20" selected>Standard (20%)</option>
+                    <option value="0.25">High (25%)</option>
+                </select>
+            </div>
+        </div>
 
-<div class="box">
-<h2>☀️ Panel</h2>
-<div class="input-group"><input id="panelPower" value="535"><span>W</span></div>
-<div class="input-group"><input id="voc" value="45"><span>Voc (V)</span></div>
-<div class="input-group"><input id="isc" value="14"><span>Isc (A)</span></div>
-<div class="input-group"><input id="stringSize" value="19"><span>Panel/String</span></div>
-</div>
+        <div class="box">
+            <h2>💰 Finance & Battery</h2>
+            <div class="input-row"><label>Electricity Cost</label><input id="ePrice" value="4.7"><span>฿</span></div>
+            <div class="input-row"><label>Project Cost</label><input id="cost" value="350000"><span>฿</span></div>
+            <div class="input-row"><label>Battery Req.</label><input id="batKwh" value="10"><span>kWh</span></div>
+            <div class="input-row"><label>Inverter Eff.</label><input id="invEff" value="97"><span>%</span></div>
+        </div>
+    </div>
 
-<div class="box">
-<h2>⚙️ Design</h2>
-<div class="input-group"><input id="area" value="1000"><span>m²</span></div>
-<div class="input-group"><input id="eff" value="80"><span>%</span></div>
-<div class="input-group"><input id="tilt" value="15"><span>Tilt°</span></div>
-<div class="input-group"><input id="azimuth" value="180"><span>Azimuth°</span></div>
-</div>
+    <div class="actions">
+        <button class="btn-run" onclick="runSimulation()">⚡ RUN FULL SIMULATION</button>
+        <button class="btn-pdf" onclick="exportReport()">📄 PDF REPORT</button>
+    </div>
 
-<div class="box">
-<h2>⚡ Loss</h2>
-<div class="input-group"><input id="tempLoss" value="5"><span>%</span></div>
-<div class="input-group"><input id="dustLoss" value="3"><span>%</span></div>
-<div class="input-group"><input id="invLoss" value="4"><span>%</span></div>
-</div>
+    <div id="result-display">ผลการคำนวณจะแสดงที่นี่...</div>
 
-<div class="box">
-<h2>💰 Financial</h2>
-<div class="input-group"><input id="price" value="4"><span>บาท/kWh</span></div>
-<div class="input-group"><input id="cost" value="1000000"><span>บาท</span></div>
-</div>
-
-<button onclick="calc()">⚡ Run Simulation</button>
-<button onclick="exportPDF()">📄 Export PDF</button>
-
-<div class="box"><div id="result"></div></div>
-<div class="box"><canvas id="chart"></canvas></div>
-
+    <div class="box">
+        <canvas id="energyChart"></canvas>
+    </div>
 </div>
 
 <script>
+let solarChart = null;
 
-async function getSolar(lat, lon){
-let url = `https://power.larc.nasa.gov/api/temporal/monthly/point?parameters=ALLSKY_SFC_SW_DWN&community=RE&longitude=${lon}&latitude=${lat}&format=JSON`;
-let res = await fetch(url);
-let data = await res.json();
-return data.properties.parameter.ALLSKY_SFC_SW_DWN;
+async function runSimulation() {
+    const getV = (id) => parseFloat(document.getElementById(id).value);
+    
+    // ดึงค่า Input
+    const lat = getV('lat'), lon = getV('lon');
+    const pWp = getV('pWp'), pQty = getV('pQty'), pVoc = getV('pVoc'), pIsc = getV('pIsc');
+    const pStr = getV('pStr'), tilt = getV('tilt'), azi = getV('azi');
+    const ePrice = getV('ePrice'), cost = getV('cost'), loss = getV('lossLevel');
+
+    try {
+        // 1. ดึงข้อมูล NASA (Monthly Climatology)
+        const response = await fetch(`https://power.larc.nasa.gov/api/temporal/monthly/point?parameters=ALLSKY_SFC_SW_DWN&community=RE&longitude=${lon}&latitude=${lat}&format=JSON`);
+        const data = await response.json();
+        const solarRaw = data.properties.parameter.ALLSKY_SFC_SW_DWN;
+
+        // 2. Logic การคำนวณวิศวกรรม
+        const systemSizeKW = (pWp * pQty) / 1000;
+        const stringVoc = pVoc * pStr;
+        const totalStrings = pQty / pStr;
+        
+        // Orientation Factor (Simple Model)
+        const aziRad = (azi - 180) * (Math.PI / 180);
+        const orientationEff = Math.cos(aziRad) * 0.98; // ลดทอนถ้าไม่หันใต้
+
+        let monthlyGen = [];
+        let yearlyTotal = 0;
+        const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+
+        Object.values(solarRaw).slice(0, 12).forEach((hsp, i) => {
+            const days = new Date(2024, i+1, 0).getDate();
+            const energy = hsp * systemSizeKW * (1 - loss) * orientationEff * days;
+            monthlyGen.push(energy.toFixed(1));
+            yearlyTotal += energy;
+        });
+
+        const yearlySaving = yearlyTotal * ePrice;
+        const roi = cost / yearlySaving;
+
+        // 3. แสดงผลลัพธ์
+        const vocStatus = stringVoc > 1000 ? '<span class="status-danger">⚠️ Danger (Over 1000V)</span>' : '<span class="status-ok">✔️ Safe</span>';
+        
+        document.getElementById('result-display').innerHTML = `
+            <strong>📊 System Summary:</strong><br>
+            • System Size: ${systemSizeKW.toFixed(2)} kWp<br>
+            • Estimated Yield: ${yearlyTotal.toLocaleString()} kWh/year<br>
+            • Monthly Avg: ${(yearlyTotal/12).toLocaleString()} kWh/month<br>
+            • String Voltage (Voc): ${stringVoc.toFixed(1)} V ${vocStatus}<br>
+            • Max String Current: ${(pIsc * totalStrings).toFixed(2)} A<br>
+            <hr style="border:0; border-top:1px solid #334155">
+            <strong>💰 Financial Analysis:</strong><br>
+            • Annual Saving: ${yearlySaving.toLocaleString()} THB<br>
+            • Payback Period: ${roi.toFixed(1)} Years<br>
+            • ROI: ${((yearlySaving/cost)*100).toFixed(1)} % / Year
+        `;
+
+        // 4. วาดกราฟ
+        updateChart(months, monthlyGen);
+
+    } catch (error) {
+        console.error(error);
+        alert("เกิดข้อผิดพลาดในการดึงข้อมูลจาก NASA");
+    }
 }
 
-let globalResult = "";
-
-async function calc(){
-
-let lat = +lat.value;
-let lon = +lon.value;
-
-let panelPower = +panelPower.value;
-let voc = +voc.value;
-let isc = +isc.value;
-let stringSize = +stringSize.value;
-
-let area = +area.value;
-let eff = +eff.value/100;
-let tilt = +tilt.value;
-let azimuth = +azimuth.value;
-
-let tempLoss = +tempLoss.value/100;
-let dustLoss = +dustLoss.value/100;
-let invLoss = +invLoss.value/100;
-
-let price = +price.value;
-let cost = +cost.value;
-
-// ===== NASA =====
-let solar = await getSolar(lat, lon);
-
-let months = Object.keys(solar);
-let energyMonthly = [];
-let totalYear = 0;
-
-months.forEach(m=>{
-let irr = solar[m];
-
-// Tilt effect (approx)
-let tiltFactor = 1 + (tilt-10)/100;
-
-let energy = irr * area * eff * tiltFactor;
-
-energy *= (1-tempLoss)*(1-dustLoss)*(1-invLoss);
-
-energyMonthly.push(energy.toFixed(0));
-totalYear += energy;
-});
-
-// ===== STRING CHECK =====
-let stringVoltage = voc * stringSize;
-let stringCurrent = isc;
-
-let voltageStatus = stringVoltage < 1000 ? "OK" : "⚠️ Over Voltage";
-let currentStatus = stringCurrent < 15 ? "OK" : "⚠️ Over Current";
-
-// ===== INVERTER AUTO =====
-let inverterKW = totalYear/365/5;
-let inverterSuggest = Math.ceil(inverterKW/10)*10;
-
-// ===== FINANCE =====
-let saving = totalYear * price;
-let roi = cost / saving;
-
-// ===== RESULT =====
-globalResult =
-`Energy/year: ${totalYear.toFixed(0)} kWh
-PR: ${((1-tempLoss-dustLoss-invLoss)*100).toFixed(1)} %
-Voltage: ${stringVoltage.toFixed(0)} V (${voltageStatus})
-Current: ${stringCurrent.toFixed(1)} A (${currentStatus})
-Inverter: ${inverterSuggest} kW
-Saving: ${saving.toFixed(0)} บาท/ปี
-ROI: ${roi.toFixed(1)} ปี`;
-
-document.getElementById("result").innerText = globalResult;
-
-// ===== CHART =====
-new Chart(chart, {
-type:'line',
-data:{ labels:months, datasets:[{label:"kWh", data:energyMonthly}] }
-});
-
+function updateChart(labels, data) {
+    const ctx = document.getElementById('energyChart').getContext('2d');
+    if (solarChart) solarChart.destroy();
+    solarChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Monthly Production (kWh)',
+                data: data,
+                backgroundColor: '#22c55e',
+                borderRadius: 5
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true, grid: { color: '#f1f5f9' } } }
+        }
+    });
 }
 
-// ===== PDF =====
-function exportPDF(){
-const { jsPDF } = window.jspdf;
-let doc = new jsPDF();
-doc.text("Solar Report", 10,10);
-doc.text(globalResult,10,20);
-doc.save("solar-report.pdf");
+function exportReport() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    doc.text("Solar Engineering Report", 20, 20);
+    doc.text(document.getElementById('result-display').innerText, 20, 40);
+    doc.save("Solar-Report.pdf");
 }
-
 </script>
 
 </body>
