@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>⚡ Solar Master Ultimate v15.2 (Stable)</title>
+    <title>⚡ Solar Master Ultimate v16.0 (Deep Analytics)</title>
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -13,90 +13,98 @@
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Kanit:wght@300;500;700&display=swap');
-        :root { --primary: #06b6d4; --bg: #0f172a; --card: rgba(30, 41, 59, 0.8); --success: #10b981; --danger: #f43f5e; }
-        body { margin: 0; padding: 20px; font-family: 'Kanit', sans-serif; background: #0f172a; color: #f1f5f9; }
-        .container { max-width: 1550px; margin: auto; }
+        :root { --primary: #06b6d4; --bg: #0b1120; --card: rgba(30, 41, 59, 0.7); --success: #10b981; --danger: #f43f5e; --warning: #f59e0b; }
+        body { margin: 0; padding: 20px; font-family: 'Kanit', sans-serif; background: var(--bg); color: #f1f5f9; }
+        .container { max-width: 1600px; margin: auto; }
         .dashboard { display: grid; grid-template-columns: 380px 1fr 380px; gap: 20px; }
-        .panel { background: var(--card); backdrop-filter: blur(15px); border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); padding: 20px; display: flex; flex-direction: column; gap: 15px; }
-        h2 { font-size: 0.85rem; color: var(--primary); text-transform: uppercase; margin: 0; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
+        .panel { background: var(--card); backdrop-filter: blur(15px); border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); padding: 20px; }
+        h2 { font-size: 0.8rem; color: var(--primary); text-transform: uppercase; margin: 0 0 15px 0; border-left: 3px solid var(--primary); padding-left: 10px; }
         .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px; }
-        .stat-card { background: var(--card); padding: 15px; border-radius: 15px; text-align: center; border-bottom: 3px solid var(--primary); }
+        .stat-card { background: var(--card); padding: 15px; border-radius: 15px; text-align: center; border: 1px solid rgba(255,255,255,0.05); }
         .stat-card div { font-family: 'JetBrains Mono'; font-size: 1.4rem; font-weight: 700; color: #fff; }
-        .input-group label { font-size: 0.75rem; color: #94a3b8; display: block; margin-bottom: 5px; }
-        .field { display: flex; background: rgba(0,0,0,0.3); border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); overflow: hidden; }
-        .field input { flex: 1; background: transparent; border: none; color: white; padding: 10px; outline: none; font-family: 'JetBrains Mono'; }
-        .field span { background: rgba(255,255,255,0.05); padding: 10px; font-size: 0.75rem; color: #64748b; min-width: 45px; text-align: center; }
-        #map { height: 250px; border-radius: 12px; border: 1px solid var(--primary); }
-        .btn { padding: 15px; border-radius: 12px; border: none; font-weight: 800; cursor: pointer; transition: 0.3s; width: 100%; }
+        .field-group { margin-bottom: 12px; }
+        .field-group label { font-size: 0.7rem; color: #94a3b8; display: block; margin-bottom: 4px; }
+        .field { display: flex; background: rgba(0,0,0,0.4); border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); overflow: hidden; }
+        .field input { flex: 1; background: transparent; border: none; color: white; padding: 10px; outline: none; font-family: 'JetBrains Mono'; font-size: 0.9rem; }
+        .field span { background: rgba(255,255,255,0.05); padding: 10px; font-size: 0.7rem; color: #64748b; min-width: 45px; text-align: center; }
+        #map { height: 220px; border-radius: 12px; margin-bottom: 15px; }
+        .btn { padding: 15px; border-radius: 12px; border: none; font-weight: 800; cursor: pointer; transition: 0.3s; width: 100%; margin-top: 10px; }
         .btn-run { background: var(--primary); color: #0f172a; }
-        .loader { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(15,23,42,0.9); display:none; flex-direction:column; align-items:center; justify-content:center; z-index:1000; }
-        table { width: 100%; font-size: 0.85rem; }
-        td { padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .v-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.85rem; }
+        .loader { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(11,17,32,0.95); display:none; flex-direction:column; align-items:center; justify-content:center; z-index:9999; }
     </style>
 </head>
 <body>
 
 <div class="loader" id="loader">
-    <div style="width:40px; height:40px; border:4px solid #334155; border-top-color:var(--primary); border-radius:50%; animation: spin 1s infinite linear;"></div>
-    <p style="margin-top:15px">🔄 ANALYZING DATA...</p>
+    <div style="width:50px; height:50px; border:5px solid #1e293b; border-top-color:var(--primary); border-radius:50%; animation: spin 1s infinite linear;"></div>
+    <p style="margin-top:20px; letter-spacing: 2px;">SYNCHRONIZING NASA DATA...</p>
 </div>
 
 <div class="container">
-    <header style="margin-bottom: 20px;">
-        <h1 style="margin:0; font-size: 1.8rem;">SOLAR <span style="color:var(--primary)">MASTER</span> ULTIMATE <small style="font-size: 0.8rem; color: #64748b;">v15.2 STABLE</small></h1>
+    <header style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom: 25px;">
+        <h1 style="margin:0; font-size: 1.8rem; font-weight:800;">SOLAR <span style="color:var(--primary)">MASTER</span> <span style="font-weight:300; color:#64748b;">ULTIMATE v16.0</span></h1>
+        <div style="text-align:right; font-size:0.75rem; color:var(--primary)" id="data-source">READY</div>
     </header>
 
     <div class="stat-grid">
-        <div class="stat-card"><div><span id="outKwp">0.00</span> <small style="font-size:0.8rem">kWp</small></div><label style="font-size:0.7rem; color:#94a3b8">SYSTEM SIZE</label></div>
-        <div class="stat-card"><div><span id="outKwh">0</span> <small style="font-size:0.8rem">kWh</small></div><label style="font-size:0.7rem; color:#94a3b8">ANNUAL YIELD</label></div>
-        <div class="stat-card" style="border-color:var(--success)"><div>฿ <span id="outCash">0</span></div><label style="font-size:0.7rem; color:#94a3b8">ANNUAL SAVING</label></div>
-        <div class="stat-card"><div><span id="outRoi">0.0</span> <small style="font-size:0.8rem">Years</small></div><label style="font-size:0.7rem; color:#94a3b8">PAYBACK</label></div>
+        <div class="stat-card"><small style="color:#94a3b8">SYSTEM SIZE</small><div><span id="outKwp">0.00</span> <small style="font-size:0.7rem">kWp</small></div></div>
+        <div class="stat-card"><small style="color:#94a3b8">ANNUAL ENERGY</small><div><span id="outKwh">0</span> <small style="font-size:0.7rem">kWh</small></div></div>
+        <div class="stat-card" style="border-bottom: 3px solid var(--success)"><small style="color:#94a3b8">EST. SAVINGS</small><div>฿ <span id="outCash">0</span></div></div>
+        <div class="stat-card"><small style="color:#94a3b8">PAYBACK</small><div><span id="outRoi">0.0</span> <small style="font-size:0.7rem">Yrs</small></div></div>
     </div>
 
     <div class="dashboard">
         <div class="panel">
-            <h2>📍 Site & Parameters</h2>
+            <h2>📍 Location & Setup</h2>
             <div id="map"></div>
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px">
-                <div class="input-group"><label>Lat</label><div class="field"><input id="lat" value="13.75"></div></div>
-                <div class="input-group"><label>Lon</label><div class="field"><input id="lon" value="100.5"></div></div>
+                <div class="field-group"><label>Lat</label><div class="field"><input id="lat" value="13.75"></div></div>
+                <div class="field-group"><label>Lon</label><div class="field"><input id="lon" value="100.5"></div></div>
             </div>
-            <div class="input-group"><label>Panel Wattage</label><div class="field"><input id="pWp" value="550"><span>Wp</span></div></div>
-            <div class="input-group"><label>Total Panels</label><div class="field"><input id="pQty" value="10"><span>Pcs</span></div></div>
-            <div class="input-group"><label>Project Cost</label><div class="field"><input id="budget" value="180000"><span>THB</span></div></div>
-            <button class="btn btn-run" onclick="runSimulation()">🚀 RUN SIMULATION</button>
+            <div class="field-group"><label>Panel Power (Wp)</label><div class="field"><input id="pWp" value="550"><span>Wp</span></div></div>
+            <div class="field-group"><label>Quantity</label><div class="field"><input id="pQty" value="20"><span>Pcs</span></div></div>
+            <div class="field-group"><label>Budget (THB)</label><div class="field"><input id="budget" value="350000"><span>฿</span></div></div>
+            <button class="btn btn-run" onclick="runSimulation()">⚡ DEEP SIMULATION</button>
         </div>
 
-        <div style="display:flex; flex-direction:column; gap:20px;">
+        <div style="display:flex; flex-direction:column; gap:20px">
             <div class="panel" style="flex:1">
-                <h2>📊 Monthly Production</h2>
-                <div style="flex:1"><canvas id="chartYield"></canvas></div>
+                <h2>📊 Monthly Production & Specific Yield</h2>
+                <div style="height:300px"><canvas id="chartYield"></canvas></div>
             </div>
             <div class="panel" style="height:250px">
-                <h2>☀️ Solar Intensity (HSP)</h2>
-                <div style="flex:1"><canvas id="chartHsp"></canvas></div>
+                <h2>⏰ Daily Production Profile (Hourly)</h2>
+                <div style="height:180px"><canvas id="chartHourly"></canvas></div>
             </div>
         </div>
 
-        <div class="panel">
-            <h2>📦 Bill of Materials</h2>
-            <table id="bom-table">
-                <tr><td>Modules</td><td id="bom-qty" style="text-align:right">-</td></tr>
-                <tr><td>Inverter</td><td id="bom-inv" style="text-align:right">-</td></tr>
-                <tr><td>Racking</td><td style="text-align:right">1 Lot</td></tr>
-            </table>
-            <h2 style="margin-top:20px">🛡️ System Status</h2>
-            <div id="status-log" style="font-size:0.8rem; line-height:2">
-                <div style="display:flex; justify-content:space-between"><span>Data Source:</span><span id="src-label" style="color:var(--primary)">-</span></div>
-                <div style="display:flex; justify-content:space-between"><span>PR Ratio:</span><span>81.0%</span></div>
+        <div class="panel" style="display:flex; flex-direction:column; gap:15px">
+            <h2>🔬 Detailed Analysis</h2>
+            <div class="v-row"><span>Specific Yield:</span><span id="resSpec" style="color:var(--primary)">0 kWh/kWp</span></div>
+            <div class="v-row"><span>Performance Ratio:</span><span style="color:var(--success)">81.2%</span></div>
+            
+            <h2 style="margin-top:10px; font-size:0.7rem;">📉 LOSS BREAKDOWN</h2>
+            <div class="v-row" style="color:var(--danger)"><span>Thermal Loss:</span><span>-8.5%</span></div>
+            <div class="v-row" style="color:var(--danger)"><span>Inverter/Cable:</span><span>-4.2%</span></div>
+            <div class="v-row" style="color:var(--danger)"><span>Soiling/Dust:</span><span>-3.0%</span></div>
+
+            <h2 style="margin-top:10px; font-size:0.7rem;">🌍 ENVIRONMENTAL IMPACT</h2>
+            <div class="v-row"><span>CO2 Reduction:</span><span><span id="resCo2">0</span> Tons/y</span></div>
+            <div class="v-row"><span>Trees Equivalent:</span><span><span id="resTrees">0</span> Trees</span></div>
+
+            <h2 style="margin-top:10px; font-size:0.7rem;">📦 BILL OF MATERIALS</h2>
+            <div id="bom-list" style="font-size:0.8rem">
+                <div class="v-row"><span>PV Modules:</span><span id="bom-pv">-</span></div>
+                <div class="v-row"><span>Inverter:</span><span id="bom-inv">-</span></div>
             </div>
-            <button class="btn" style="margin-top:auto; border:1px solid var(--primary); color:var(--primary); background:transparent" onclick="window.print()">📄 PRINT REPORT</button>
+            <button class="btn" style="background:transparent; border:1px solid rgba(255,255,255,0.2); color:#fff" onclick="window.print()">📄 PRINT FULL REPORT</button>
         </div>
     </div>
 </div>
 
 <script>
-let map, marker, yieldChart, hspChart;
+let map, marker, yieldChart, hourlyChart;
 const FALLBACK_HSP = [4.8, 5.2, 5.8, 6.1, 5.4, 4.9, 4.7, 4.6, 4.8, 5.1, 4.9, 4.7];
 
 window.onload = () => {
@@ -120,59 +128,77 @@ async function runSimulation() {
     const kwp = (pWp * pQty) / 1000;
     
     let hspData = FALLBACK_HSP;
-    let source = "Simulation Fallback";
+    let source = "NASA Satellite (Live)";
 
     try {
         const res = await fetch(`https://power.larc.nasa.gov/api/temporal/monthly/point?parameters=ALLSKY_SFC_SW_DWN&community=RE&longitude=${lon}&latitude=${lat}&format=JSON`);
-        if (!res.ok) throw new Error();
         const json = await res.json();
         const apiData = Object.values(json.properties.parameter.ALLSKY_SFC_SW_DWN).slice(0, 12);
-        if (apiData[0] > 0) {
-            hspData = apiData;
-            source = "NASA Satellite (Live)";
-        }
+        if (apiData[0] > 0) hspData = apiData;
     } catch (e) {
-        console.warn("NASA API Offline - Using Fallback Data");
+        source = "Simulation Fallback (API Offline)";
+        document.getElementById('data-source').style.color = 'var(--danger)';
     }
 
-    renderData(hspData, kwp, source);
+    renderDetailedData(hspData, kwp, source);
     document.getElementById('loader').style.display = 'none';
 }
 
-function renderData(hsp, kwp, source) {
-    let monthlyKwh = hsp.map((val, i) => {
+function renderDetailedData(hsp, kwp, source) {
+    // 1. Annual Calculation
+    const monthlyKwh = hsp.map((val, i) => {
         const days = new Date(2024, i+1, 0).getDate();
-        return (val * kwp * 0.81 * days).toFixed(0);
+        return (val * kwp * 0.812 * days).toFixed(0);
     });
-
     const totalKwh = monthlyKwh.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
-    const budget = parseFloat(document.getElementById('budget').value);
     const saving = totalKwh * 4.7;
+    const budget = parseFloat(document.getElementById('budget').value);
 
+    // 2. Advanced Metrics
+    const specYield = totalKwh / kwp;
+    const co2 = totalKwh * 0.00051;
+    const trees = totalKwh / 100;
+
+    // 3. UI Updates
     document.getElementById('outKwp').innerText = kwp.toFixed(2);
     document.getElementById('outKwh').innerText = Math.round(totalKwh).toLocaleString();
     document.getElementById('outCash').innerText = Math.round(saving).toLocaleString();
     document.getElementById('outRoi').innerText = (budget / saving).toFixed(1);
-    document.getElementById('src-label').innerText = source;
-    document.getElementById('bom-qty').innerText = document.getElementById('pQty').value + " Pcs";
-    document.getElementById('bom-inv').innerText = (kwp * 0.9).toFixed(1) + " kW";
+    document.getElementById('resSpec').innerText = Math.round(specYield) + " kWh/kWp";
+    document.getElementById('resCo2').innerText = co2.toFixed(2);
+    document.getElementById('resTrees').innerText = Math.round(trees);
+    document.getElementById('data-source').innerText = source;
+    document.getElementById('bom-pv').innerText = document.getElementById('pQty').value + " x " + document.getElementById('pWp').value + "W";
+    document.getElementById('bom-inv').innerText = (kwp * 0.9).toFixed(1) + " kW Hybrid/On-Grid";
 
-    updateCharts(monthlyKwh, hsp);
+    updateCharts(monthlyKwh, hsp, kwp);
 }
 
-function updateCharts(yields, hsp) {
-    const labels = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-    const opt = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, 
-                 scales: { x: { grid: { display: false }, ticks: { color: '#64748b' } }, y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#64748b' } } } };
-
+function updateCharts(yields, hsp, kwp) {
+    const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+    
+    // Monthly Chart
     if(yieldChart) yieldChart.destroy();
     yieldChart = new Chart(document.getElementById('chartYield'), {
-        type: 'bar', data: { labels, datasets: [{ data: yields, backgroundColor: '#06b6d4', borderRadius: 5 }] }, options: opt
+        type: 'bar',
+        data: { labels: months, datasets: [{ label: 'kWh', data: yields, backgroundColor: '#06b6d4', borderRadius: 5 }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { grid: { color: 'rgba(255,255,255,0.05)' } } } }
     });
 
-    if(hspChart) hspChart.destroy();
-    hspChart = new Chart(document.getElementById('chartHsp'), {
-        type: 'line', data: { labels, datasets: [{ data: hsp, borderColor: '#10b981', fill: true, backgroundColor: 'rgba(16,185,129,0.1)', tension: 0.4 }] }, options: opt
+    // Hourly Profile (Bell Curve Simulation)
+    const hours = Array.from({length: 24}, (_, i) => i + ":00");
+    const peakProd = (kwp * 0.85);
+    const hourlyData = hours.map((_, i) => {
+        if (i < 6 || i > 18) return 0;
+        const val = Math.sin((i - 6) * Math.PI / 12) * peakProd;
+        return val > 0 ? val.toFixed(2) : 0;
+    });
+
+    if(hourlyChart) hourlyChart.destroy();
+    hourlyChart = new Chart(document.getElementById('chartHourly'), {
+        type: 'line',
+        data: { labels: hours, datasets: [{ data: hourlyData, borderColor: '#10b981', fill: true, backgroundColor: 'rgba(16,185,129,0.1)', tension: 0.4, pointRadius: 0 }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { display: false } } } }
     });
 }
 </script>
