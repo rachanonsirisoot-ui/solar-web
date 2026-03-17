@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>⚡ Solar Pro Enterprise Master v7.0</title>
+    <title>⚡ Solar Pro Enterprise v8.0</title>
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -12,343 +12,278 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
 
     <style>
-        :root { 
-            --primary: #10b981; --secondary: #6366f1; --danger: #ef4444; 
-            --warning: #f59e0b; --bg: #0f172a; --card: #1e293b; --text: #f1f5f9; 
-        }
-        body { font-family: 'Inter', 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; }
-        .container { max-width: 1300px; margin: auto; }
-        .card { background: var(--card); padding: 25px; border-radius: 16px; border: 1px solid #334155; margin-bottom: 20px; }
+        :root { --primary: #10b981; --secondary: #6366f1; --danger: #ef4444; --warning: #f59e0b; --bg: #0f172a; --card: #1e293b; --text: #f1f5f9; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; }
+        .container { max-width: 1400px; margin: auto; }
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 20px; }
+        .card { background: var(--card); padding: 20px; border-radius: 16px; border: 1px solid #334155; margin-bottom: 20px; }
         
-        h1, h2 { color: var(--primary); margin-top: 0; }
-        .subtitle { color: #94a3b8; margin-top: -10px; margin-bottom: 25px; }
-
-        #map { height: 350px; border-radius: 16px; border: 2px solid #334155; margin-bottom: 20px; z-index: 1; }
-
-        /* Input Styling */
-        .input-group { margin-bottom: 15px; }
-        label { display: block; font-size: 0.75rem; color: #94a3b8; margin-bottom: 5px; text-transform: uppercase; font-weight: 600; }
-        .field-box { display: flex; background: #0f172a; border-radius: 8px; border: 1px solid #475569; overflow: hidden; }
-        .field-box input, .field-box textarea { flex: 1; background: transparent; border: none; color: white; padding: 12px; outline: none; }
-        .field-box span { background: #334155; padding: 12px; font-size: 0.75rem; min-width: 60px; text-align: center; color: #94a3b8; }
+        h2 { color: var(--primary); font-size: 1.2rem; margin-top: 0; display: flex; align-items: center; gap: 10px; }
+        label { display: block; font-size: 0.7rem; color: #94a3b8; margin: 8px 0 4px; text-transform: uppercase; font-weight: bold; }
         
-        .spec-title { font-size: 0.85rem; font-weight: bold; color: var(--secondary); margin-bottom: 10px; border-bottom: 1px solid #334155; padding-bottom: 5px; }
+        .field-box { display: flex; background: #0f172a; border-radius: 8px; border: 1px solid #475569; overflow: hidden; margin-bottom: 5px; }
+        .field-box input, .field-box select { flex: 1; background: transparent; border: none; color: white; padding: 10px; outline: none; font-size: 0.9rem; }
+        .field-box span { background: #334155; padding: 10px; font-size: 0.75rem; min-width: 50px; text-align: center; }
 
-        /* Buttons */
-        .btn-group { display: flex; gap: 15px; margin: 30px 0; }
-        button { flex: 1; padding: 18px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; font-size: 1rem; }
-        .btn-calc { background: var(--primary); color: #064e3b; }
-        .btn-pdf { background: var(--secondary); color: white; }
-        button:hover { transform: translateY(-3px); filter: brightness(1.1); box-shadow: 0 10px 20px rgba(0,0,0,0.4); }
+        .btn-add { background: var(--secondary); color: white; border: none; padding: 8px; border-radius: 5px; cursor: pointer; font-size: 0.8rem; margin-top: 10px; width: 100%; }
+        .btn-calc { background: var(--primary); color: #064e3b; padding: 18px; font-size: 1.1rem; width: 100%; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; margin-top: 20px; }
+        .btn-pdf { background: #f1f5f9; color: #0f172a; padding: 18px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; }
 
-        /* Status & Results */
-        #result-panel { font-family: 'Fira Code', monospace; font-size: 0.9rem; line-height: 1.6; color: #5eead4; background: #020617; padding: 25px; border-radius: 16px; border-left: 6px solid var(--primary); }
-        .status-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; margin-bottom: 10px; }
-        .status-ok { background: rgba(16, 185, 129, 0.2); color: var(--primary); }
-        .status-error { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
+        #validate-box { padding: 15px; border-radius: 10px; font-family: monospace; font-size: 0.9rem; line-height: 1.6; }
+        .status-pill { padding: 2px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: bold; margin-left: 10px; }
+        .pass { background: rgba(16,185,129,0.2); color: var(--primary); }
+        .fail { background: rgba(239,68,68,0.2); color: var(--danger); }
         
-        /* Fixed Chart Container */
-        .chart-container { position: relative; height: 350px; width: 100%; }
+        #map { height: 300px; border-radius: 15px; margin-bottom: 20px; border: 1px solid #334155; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <header style="text-align: center;">
-        <h1>⚡ Solar Pro <span style="color:white">Enterprise Master v7.0</span></h1>
-        <p class="subtitle">ระบบวิเคราะห์วิศวกรรมและการเงินเพื่อการขายมืออาชีพ</p>
-    </header>
-
+    <h1 style="text-align:center; color:white;">⚡ Solar Pro <span style="color:var(--primary)">Enterprise v8.0</span></h1>
+    
     <div id="map"></div>
 
     <div class="grid">
         <div class="card">
-            <h2>☀️ รายละเอียดแผงโซลาร์</h2>
-            <div class="spec-title">ข้อมูลไฟฟ้า (STC)</div>
-            <div class="grid" style="grid-template-columns: 1fr 1fr; gap: 10px;">
-                <div class="input-group">
-                    <label>Pmax (Wp)</label>
-                    <div class="field-box"><input id="pWp" value="550"></div>
-                </div>
-                <div class="input-group">
-                    <label>Voc (V)</label>
-                    <div class="field-box"><input id="pVoc" value="49.8"></div>
-                </div>
-                <div class="input-group">
-                    <label>Isc (A)</label>
-                    <div class="field-box"><input id="pIsc" value="13.9"></div>
-                </div>
-                <div class="input-group">
-                    <label>Vmp (V)</label>
-                    <div class="field-box"><input id="pVmp" value="41.9"></div>
+            <h2>☀️ PV Module Database</h2>
+            <label>เลือกจากฐานข้อมูล</label>
+            <div class="field-box">
+                <select id="panelSelect" onchange="loadPanelData()">
+                    <option value="">-- เลือกแผง --</option>
+                    <option value="jinko550">Jinko Tiger Pro 550W</option>
+                    <option value="longi545">LONGi Hi-MO 5 545W</option>
+                    <option value="trina600">Trina Vertex 600W</option>
+                </select>
+            </div>
+            
+            <div style="background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px; margin-top: 10px;">
+                <label>หรือเพิ่มรุ่นใหม่เอง</label>
+                <div class="grid" style="grid-template-columns: 1fr 1fr; gap:5px;">
+                    <input type="text" id="newPName" placeholder="ชื่อรุ่น" class="btn-add" style="background:#0f172a; text-align:left; padding-left:10px;">
+                    <button class="btn-add" onclick="addNewPanel()">➕ Add to List</button>
                 </div>
             </div>
-            <div class="spec-title" style="margin-top:15px">การจัดสตริง</div>
+
             <div class="grid" style="grid-template-columns: 1fr 1fr; gap: 10px;">
-                <div class="input-group">
-                    <label>จำนวนแผงรวม</label>
-                    <div class="field-box"><input id="pQty" value="20"></div>
-                </div>
-                <div class="input-group">
-                    <label>แผงต่อสตริง</label>
-                    <div class="field-box"><input id="pStr" value="10"></div>
-                </div>
+                <div class="input-group"><label>Pmax (Wp)</label><div class="field-box"><input id="pWp" value="550"></div></div>
+                <div class="input-group"><label>Voc (V)</label><div class="field-box"><input id="pVoc" value="49.8"></div></div>
+                <div class="input-group"><label>Isc (A)</label><div class="field-box"><input id="pIsc" value="13.9"></div></div>
+                <div class="input-group"><label>Vmp (V)</label><div class="field-box"><input id="pVmp" value="41.9"></div></div>
             </div>
+            <label>จำนวนติดตั้ง / สตริง</label>
+            <div class="field-box"><input id="pQty" value="20"><span>แผง</span><input id="pStr" value="10"><span>แผง/Str</span></div>
         </div>
 
         <div class="card">
-            <h2>🔌 การตั้งค่าอินเวอร์เตอร์</h2>
-            <div class="spec-title">ข้อมูลอินพุต (DC)</div>
-            <div class="input-group">
-                <label>Max DC Input Voltage (V)</label>
-                <div class="field-box"><input id="invMaxV" value="1100"><span>Vdc</span></div>
+            <h2>🔌 Inverter Database</h2>
+            <label>เลือกจากฐานข้อมูล</label>
+            <div class="field-box">
+                <select id="invSelect" onchange="loadInvData()">
+                    <option value="">-- เลือกอินเวอร์เตอร์ --</option>
+                    <option value="huawei10">Huawei SUN2000-10KTL</option>
+                    <option value="sungrow10">Sungrow SG10RT</option>
+                    <option value="solis10">Solis S6-10K</option>
+                </select>
             </div>
-            <div class="input-group">
-                <label>MPPT Voltage Range (V)</label>
-                <div class="field-box">
-                    <input id="invMpptMin" value="160" title="Min">
-                    <input id="invMpptMax" value="950" title="Max">
-                    <span>Vdc</span>
+            
+            <div style="background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px; margin-top: 10px;">
+                <label>หรือเพิ่มรุ่นใหม่เอง</label>
+                <div class="grid" style="grid-template-columns: 1fr 1fr; gap:5px;">
+                    <input type="text" id="newIName" placeholder="ชื่อรุ่น" class="btn-add" style="background:#0f172a; text-align:left; padding-left:10px;">
+                    <button class="btn-add" onclick="addNewInv()">➕ Add to List</button>
                 </div>
             </div>
-            <div class="spec-title" style="margin-top:15px">ข้อมูลเอาต์พุต (AC)</div>
-            <div class="grid" style="grid-template-columns: 1fr 1fr; gap: 10px;">
-                <div class="input-group">
-                    <label>พิกัดกำลัง (W)</label>
-                    <div class="field-box"><input id="invAC" value="10000"></div>
-                </div>
-                <div class="input-group">
-                    <label>ประสิทธิภาพ (%)</label>
-                    <div class="field-box"><input id="invEff" value="98.5"></div>
-                </div>
-            </div>
+
+            <div class="input-group"><label>Max DC Input Voltage</label><div class="field-box"><input id="invMaxV" value="1100"><span>V</span></div></div>
+            <div class="input-group"><label>MPPT Range (Min - Max)</label><div class="field-box"><input id="invMinMppt" value="160"><input id="invMaxMppt" value="950"><span>V</span></div></div>
+            <div class="input-group"><label>Max Input Current (Isc Limit)</label><div class="field-box"><input id="invMaxI" value="15"><span>A</span></div></div>
         </div>
 
-        <div class="card" style="border-color: var(--secondary);">
-            <h2>📄 ตั้งค่ารายงาน PDF</h2>
-            <div class="input-group">
-                <label>ชื่อลูกค้า</label>
-                <div class="field-box"><input id="custName" placeholder="ระบุชื่อลูกค้า"></div>
-            </div>
-            <div class="input-group">
-                <label>งบประมาณโครงการ (CAPEX)</label>
-                <div class="field-box"><input id="totalCost" value="350000"><span>THB</span></div>
-            </div>
-            <div class="input-group">
-                <label>โลโก้บริษัท (เลือกไฟล์ JPG/PNG)</label>
-                <div class="field-box"><input type="file" id="logoFile" accept="image/jpeg, image/png" style="padding:10px; color:#94a3b8;"></div>
-                <p style="font-size:0.75rem; color:#94a3b8; margin:5px 0;">แนะนำขนาด 200x200px. JPG หรือ PNG เท่านั้น</p>
-            </div>
-            <div class="input-group">
-                <label>หมายเหตุเพิ่มเติม</label>
-                <div class="field-box"><textarea id="notes" rows="3" placeholder="Additional details..."></textarea></div>
-            </div>
-        </div>
-    </div>
-
-    <input type="hidden" id="lat" value="13.75">
-    <input type="hidden" id="lon" value="100.5">
-
-    <div class="btn-group">
-        <button class="btn-calc" onclick="runAnalysis()">🚀 เริ่มการคำนวณและตรวจสอบระบบ</button>
-        <button class="btn-pdf" onclick="exportPDF()">📄 ออกรายงาน PDF ระดับพรีเมียม</button>
-    </div>
-
-    <div class="grid" style="grid-template-columns: 1fr 1.5fr;">
         <div class="card">
-            <h2>📝 สรุปการตรวจสอบทางวิศวกรรม</h2>
-            <div id="result-panel">พร้อมสำหรับการคำนวณ...</div>
+            <h2>📄 Project Setting</h2>
+            <label>Logo บริษัท (JPG/PNG)</label>
+            <div class="field-box"><input type="file" id="logoFile" accept="image/*" style="color:#94a3b8; padding:8px;"></div>
+            <label>ข้อมูลลูกค้า & การลงทุน</label>
+            <div class="field-box"><input id="custName" placeholder="ชื่อลูกค้า"></div>
+            <div class="field-box"><input id="totalCost" value="350000"><span>THB</span></div>
+            <label>หมายเหตุ</label>
+            <div class="field-box"><textarea id="notes" rows="3" style="width:100%; background:transparent; border:none; color:white; padding:10px;"></textarea></div>
         </div>
-        <div class="card chart-wrap">
-            <h2>📈 กราฟผลผลิตรายเดือน</h2>
-            <div class="chart-container">
-                <canvas id="yieldChart"></canvas>
-            </div>
+    </div>
+
+    <div style="display:flex; gap:15px;">
+        <button class="btn-calc" onclick="runValidation()">🚀 EXECUTE SYSTEM VALIDATION</button>
+        <button class="btn-calc btn-pdf" style="width:300px; margin-top:20px;" onclick="exportPDF()">📄 EXPORT PDF</button>
+    </div>
+
+    <div class="grid" style="grid-template-columns: 1fr 1.5fr; margin-top:20px;">
+        <div class="card" id="validate-box" style="background:#020617;">
+            <h3 style="color:var(--secondary); margin-top:0;">Engineering Report</h3>
+            กดปุ่มคำนวณเพื่อตรวจสอบระบบ...
+        </div>
+        <div class="card">
+            <canvas id="yieldChart" style="height:300px;"></canvas>
         </div>
     </div>
 </div>
 
 <script>
-let map, marker, chart, resultData;
-let logoBase64 = null; // **แก้ตรงนี้: ตัวแปรเก็บข้อมูลโลโก้แบบ Base64**
-
-// Initialize Map & File Upload
-window.onload = () => {
-    // แผนที่
-    map = L.map('map').setView([13.75, 100.5], 6);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-    marker = L.marker([13.75, 100.5], {draggable: true}).addTo(map);
-    map.on('click', e => updatePos(e.latlng.lat, e.latlng.lng));
-    marker.on('dragend', e => updatePos(e.target.getLatLng().lat, e.target.getLatLng().lng));
-
-    // **แก้ตรงนี้: ระบบแปลงไฟล์รูปภาพเป็น Base64**
-    document.getElementById('logoFile').addEventListener('change', handleLogoUpload);
+// --- Database Storage ---
+let panels = {
+    jinko550: { wp: 550, voc: 49.8, isc: 13.9, vmp: 41.9 },
+    longi545: { wp: 545, voc: 49.5, isc: 13.8, vmp: 41.6 },
+    trina600: { wp: 600, voc: 41.7, isc: 18.4, vmp: 34.2 }
 };
 
-function updatePos(lat, lng) {
-    document.getElementById('lat').value = lat.toFixed(4);
-    document.getElementById('lon').value = lng.toFixed(4);
-    marker.setLatLng([lat, lng]);
-}
+let inverters = {
+    huawei10: { maxV: 1100, minM: 160, maxM: 950, maxI: 15 },
+    sungrow10: { maxV: 1100, minM: 180, maxM: 1000, maxI: 12.5 },
+    solis10: { maxV: 1000, minM: 160, maxM: 850, maxI: 14 }
+};
 
-// **แก้ตรงนี้: ฟังก์ชันจัดการการอัปโหลดโลโก้**
-function handleLogoUpload(event) {
-    const file = event.target.files[0];
-    if (!file) return;
+// --- Initialization ---
+let chart, map, marker, logoBase64 = null;
 
-    // เช็คประเภทไฟล์
-    if (!['image/jpeg', 'image/png'].includes(file.type)) {
-        alert("กรุณาเลือกไฟล์ JPG หรือ PNG เท่านั้น!");
-        event.target.value = '';
-        return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        logoBase64 = e.target.result; // เก็บข้อมูล Base64 ไว้
-    };
-    reader.readAsDataURL(file);
-}
-
-// Analysis Logic
-async function runAnalysis() {
-    const v = id => parseFloat(document.getElementById(id).value) || 0;
+window.onload = () => {
+    map = L.map('map').setView([13.75, 100.5], 6);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+    marker = L.marker([13.75, 100.5], {draggable:true}).addTo(map);
     
-    // Engineering Validation
+    document.getElementById('logoFile').onchange = (e) => {
+        let reader = new FileReader();
+        reader.onload = (el) => logoBase64 = el.target.result;
+        reader.readAsDataURL(e.target.files[0]);
+    };
+};
+
+// --- UI Functions ---
+function loadPanelData() {
+    let d = panels[document.getElementById('panelSelect').value];
+    if(d) {
+        document.getElementById('pWp').value = d.wp;
+        document.getElementById('pVoc').value = d.voc;
+        document.getElementById('pIsc').value = d.isc;
+        document.getElementById('pVmp').value = d.vmp;
+    }
+}
+
+function loadInvData() {
+    let d = inverters[document.getElementById('invSelect').value];
+    if(d) {
+        document.getElementById('invMaxV').value = d.maxV;
+        document.getElementById('invMinMppt').value = d.minM;
+        document.getElementById('invMaxMppt').value = d.maxM;
+        document.getElementById('invMaxI').value = d.maxI;
+    }
+}
+
+function addNewPanel() {
+    let name = document.getElementById('newPName').value;
+    if(!name) return alert("ระบุชื่อรุ่นแผง");
+    panels[name] = {
+        wp: parseFloat(document.getElementById('pWp').value),
+        voc: parseFloat(document.getElementById('pVoc').value),
+        isc: parseFloat(document.getElementById('pIsc').value),
+        vmp: parseFloat(document.getElementById('pVmp').value)
+    };
+    let opt = new Option(name, name);
+    document.getElementById('panelSelect').add(opt);
+    document.getElementById('panelSelect').value = name;
+    alert("เพิ่มข้อมูลแผงสำเร็จ!");
+}
+
+function addNewInv() {
+    let name = document.getElementById('newIName').value;
+    if(!name) return alert("ระบุชื่อรุ่นอินเวอร์เตอร์");
+    inverters[name] = {
+        maxV: parseFloat(document.getElementById('invMaxV').value),
+        minM: parseFloat(document.getElementById('invMinMppt').value),
+        maxM: parseFloat(document.getElementById('invMaxMppt').value),
+        maxI: parseFloat(document.getElementById('invMaxI').value)
+    };
+    let opt = new Option(name, name);
+    document.getElementById('invSelect').add(opt);
+    document.getElementById('invSelect').value = name;
+    alert("เพิ่มข้อมูลอินเวอร์เตอร์สำเร็จ!");
+}
+
+// --- Logic & Validation ---
+let lastResult = null;
+function runValidation() {
+    const v = (id) => parseFloat(document.getElementById(id).value) || 0;
+    
     const sysKWp = (v('pWp') * v('pQty')) / 1000;
     const strVoc = v('pVoc') * v('pStr');
     const strVmp = v('pVmp') * v('pStr');
     
-    // Validations
-    const voltOk = strVoc <= v('invMaxV');
-    const mpptOk = strVmp >= v('invMpptMin') && strVmp <= v('invMpptMax');
+    // Engineering Rules
+    const isVoltOk = strVoc < v('invMaxV');
+    const isMpptOk = strVmp > v('invMinMppt') && strVmp < v('invMaxMppt');
+    const isCurrOk = v('pIsc') <= v('invMaxI');
 
-    // Yield
-    const hspThai = [5.1, 5.5, 5.8, 6.1, 5.4, 5.0, 4.8, 4.7, 4.6, 5.0, 5.1, 5.1];
-    const pr = (v('invEff')/100) * 0.82; // Combined losses
-    let monthlyGen = hspThai.map(h => (h * sysKWp * pr * 30.4).toFixed(1));
-    let yearlySum = monthlyGen.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
-    let yearlySaving = yearlySum * 4.7;
+    const status = (bool) => bool ? `<span class="status-pill pass">PASS</span>` : `<span class="status-pill fail">DANGER</span>`;
 
-    // UI Update
-    document.getElementById('result-panel').innerHTML = `
-        <div class="status-badge ${voltOk ? 'status-ok' : 'status-error'}">Voltage: ${voltOk ? 'PASS' : 'OVERLOAD'}</div>
-        <div class="status-badge ${mpptOk ? 'status-ok' : 'status-error'}">MPPT: ${mpptOk ? 'OPTIMAL' : 'OUT OF RANGE'}</div>
-        <hr style="border:0; border-top:1px solid #334155; margin:10px 0;">
-        <b>System:</b> ${sysKWp.toFixed(2)} kWp<br>
-        <b>Generation:</b> ${yearlySum.toLocaleString()} kWh/Year<br>
-        <b>Financial:</b> ฿${yearlySaving.toLocaleString()} Saving/Year
+    document.getElementById('validate-box').innerHTML = `
+        <h3 style="color:white; margin-bottom:10px;">Engineering Checks:</h3>
+        • System Size: ${sysKWp.toFixed(2)} kWp<br>
+        • DC Voltage (Voc): ${strVoc.toFixed(1)} V ${status(isVoltOk)}<br>
+        • MPPT Voltage (Vmp): ${strVmp.toFixed(1)} V ${status(isMpptOk)}<br>
+        • DC Current (Isc): ${v('pIsc')} A ${status(isCurrOk)}<br>
+        <hr style="border:0; border-top:1px solid #334155; margin:15px 0;">
+        <h3 style="color:white; margin-bottom:10px;">Economic Est:</h3>
+        • รายได้จากการประหยัด: ฿${(sysKWp * 4.7 * 5 * 365 * 0.8).toLocaleString()} /ปี<br>
+        • คืนทุนประมาณ: ${(v('totalCost') / (sysKWp * 4.7 * 5 * 365 * 0.8)).toFixed(1)} ปี
     `;
 
-    resultData = { sysKWp, strVoc, strVmp, monthlyGen, yearlySum, yearlySaving, voltOk, mpptOk };
-    renderChart(monthlyGen);
+    lastResult = { sysKWp, isVoltOk, isMpptOk, isCurrOk, strVoc, strVmp };
+    renderChart(sysKWp);
 }
 
-function renderChart(data) {
+function renderChart(kw) {
     const ctx = document.getElementById('yieldChart').getContext('2d');
-    if (chart) chart.destroy();
+    if(chart) chart.destroy();
     
-    // Gradient
-    const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-    gradient.addColorStop(0, 'rgba(16, 185, 129, 0.4)');
-    gradient.addColorStop(1, 'rgba(16, 185, 129, 0)');
-
+    const data = Array.from({length: 12}, () => (kw * 4.5 * 30 * 0.8).toFixed(0));
     chart = new Chart(ctx, {
-        type: 'line',
+        type: 'bar',
         data: {
             labels: ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
-            datasets: [{
-                label: 'Monthly Yield (kWh)',
-                data: data,
-                borderColor: '#10b981',
-                borderWidth: 3,
-                tension: 0.4,
-                fill: true,
-                backgroundColor: gradient,
-                pointRadius: 4,
-                pointHoverRadius: 8
-            }]
+            datasets: [{ label: 'Yield (kWh)', data: data, backgroundColor: '#6366f1' }]
         },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: { y: { beginAtZero: true, ticks: { color: '#94a3b8' } }, x: { ticks: { color: '#94a3b8' } } }
-        }
+        options: { responsive: true, maintainAspectRatio: false }
     });
 }
 
 function exportPDF() {
-    if (!resultData) return alert("โปรดกดคำนวณก่อนออกรายงาน!");
+    if(!lastResult) return alert("กรุณากดคำนวณก่อน");
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
-    const capex = parseFloat(document.getElementById('totalCost').value);
-    const notes = document.getElementById('notes').value || '-';
-
-    // **แก้ตรงนี้: ส่วน Header และการใส่โลโก้ (ถ้ามีอัปโหลด)**
-    doc.setFillColor(15, 23, 42); // สีน้ำเงินเข้มสไตล์ Enterprise
+    
+    doc.setFillColor(15, 23, 42);
     doc.rect(0, 0, 210, 45, 'F');
+    if(logoBase64) doc.addImage(logoBase64, 'PNG', 165, 8, 30, 30);
     
-    // ใส่โลโก้จากไฟล์ที่อัปโหลด (ถ้ามี)
-    if(logoBase64) {
-        try {
-            // ปรับขนาดและตำแหน่งโลโก้ที่มุมขวาบน
-            doc.addImage(logoBase64, 'PNG', 165, 8, 30, 30);
-        } catch(e) {
-            console.error("Error adding logo to PDF:", e);
-        }
-    }
-    
-    doc.setTextColor(16, 185, 129); // สีเขียว Primary
+    doc.setTextColor(16, 185, 129);
     doc.setFontSize(22);
-    doc.text("ENGINEERING DESIGN REPORT", 15, 25);
+    doc.text("SOLAR ENGINEERING REPORT", 15, 25);
     doc.setTextColor(255);
     doc.setFontSize(10);
-    doc.text(`PROJECT: ${document.getElementById('custName').value || 'Solar PV System'}`, 15, 35);
-    doc.text(`CLIENT: ${document.getElementById('custName').value || 'Valued Customer'}`, 15, 41);
+    doc.text(`CLIENT: ${document.getElementById('custName').value || 'Customer Name'}`, 15, 35);
 
-    // Tables
-    doc.setTextColor(0);
-    doc.setFontSize(14);
-    doc.text("1. Technical Validation", 15, 60);
     doc.autoTable({
-        startY: 65,
-        head: [['Parameter', 'Value', 'Status']],
+        startY: 55,
+        head: [['Engineering Check', 'Value', 'Status']],
         body: [
-            ['System Capacity', resultData.sysKWp.toFixed(2) + ' kWp', 'OK'],
-            ['String Voc', resultData.strVoc.toFixed(1) + ' V', resultData.voltOk ? 'PASS' : 'FAIL'],
-            ['Estimated Yield', resultData.yearlySum.toLocaleString() + ' kWh', 'NORMAL']
+            ['System Capacity', lastResult.sysKWp.toFixed(2) + ' kWp', 'VALID'],
+            ['Max String Voc', lastResult.strVoc.toFixed(1) + ' V', lastResult.isVoltOk ? 'PASS' : 'FAIL'],
+            ['Operating Vmp', lastResult.strVmp.toFixed(1) + ' V', lastResult.isMpptOk ? 'PASS' : 'WARN'],
+            ['Isc Current', document.getElementById('pIsc').value + ' A', lastResult.isCurrOk ? 'PASS' : 'FAIL']
         ],
-        headStyles: { fillColor: [15, 23, 42] }
+        headStyles: {fillColor: [15, 23, 42]}
     });
-
-    doc.text("2. Investment Analysis", 15, doc.lastAutoTable.finalY + 15);
-    doc.autoTable({
-        startY: doc.lastAutoTable.finalY + 20,
-        head: [['Metric', 'Value']],
-        body: [
-            ['Total CAPEX', capex.toLocaleString() + ' THB'],
-            ['Annual Saving', resultData.yearlySaving.toLocaleString() + ' THB'],
-            ['Estimated Payback', (capex / resultData.yearlySaving).toFixed(1) + ' Years'],
-            ['25-Year Saving', (resultData.yearlySaving * 25).toLocaleString() + ' THB']
-        ],
-        headStyles: { fillColor: [16, 185, 129] }
-    });
-
-    // Notes
-    doc.text("3. Engineering Notes", 15, doc.lastAutoTable.finalY + 15);
-    doc.setFontSize(10);
-    const splitNotes = doc.splitTextToSize(notes, 180);
-    doc.text(splitNotes, 15, doc.lastAutoTable.finalY + 25);
-
-    // Footer
-    doc.setFontSize(8);
-    doc.setTextColor(150);
-    doc.text(`Generated on: ${new Date().toLocaleString()} - พิกัด: ${document.getElementById('lat').value}, ${document.getElementById('lon').value}`, 15, 285);
-
-    // **แก้ตรงนี้: ชื่อไฟล์ PDF ตามชื่อลูกค้า**
-    const fileName = (document.getElementById('custName').value || 'Solar_Pro') + '_Report.pdf';
-    doc.save(fileName);
+    
+    doc.save("Solar_Validation_Report.pdf");
 }
 </script>
 </body>
