@@ -3,277 +3,169 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>⚡ Solar Engineer Tool</title>
+<title>⚡ Solar Simulation Tool (Pro)</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
 body {
     font-family: Arial;
-    background: linear-gradient(135deg, #0f172a, #020617);
+    background: #0f172a;
     color: white;
-    margin: 0;
     padding: 20px;
 }
-
-.container {
-    max-width: 800px;
-    margin: auto;
-}
-
-h1 {
-    text-align: center;
-    margin-bottom: 20px;
-}
-
+.container { max-width: 900px; margin:auto; }
 .box {
-    background: #1e293b;
-    padding: 20px;
-    border-radius: 15px;
-    margin-bottom: 15px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    background:#1e293b;
+    padding:15px;
+    border-radius:12px;
+    margin-bottom:10px;
 }
-
-h2 {
-    color: #38bdf8;
-    margin-bottom: 10px;
+.input-group { display:flex; margin:5px 0; }
+.input-group input, select {
+    flex:1; padding:10px; border:none;
 }
-
-/* INPUT GROUP */
-.input-group {
-    display: flex;
-    align-items: center;
-    margin: 6px 0;
-}
-
-.input-group input, .input-group select {
-    flex: 1;
-    padding: 10px;
-    border: none;
-    outline: none;
-    border-radius: 8px 0 0 8px;
-}
-
 .input-group span {
-    background: #334155;
-    padding: 10px 12px;
-    border-radius: 0 8px 8px 0;
-    font-size: 14px;
+    background:#334155;
+    padding:10px;
 }
-
-/* BUTTON */
 button {
-    width: 100%;
-    padding: 14px;
-    background: linear-gradient(90deg, #22c55e, #16a34a);
-    border: none;
-    color: white;
-    font-size: 16px;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: 0.2s;
+    width:100%;
+    padding:12px;
+    background:#22c55e;
+    border:none;
+    color:white;
 }
-
-button:hover {
-    transform: scale(1.02);
-}
-
-/* RESULT */
-.result {
-    line-height: 1.8;
-    font-size: 15px;
-}
-
-/* MOBILE */
-@media(max-width:600px){
-    body { padding: 10px; }
-}
+canvas { background:white; border-radius:10px; }
 </style>
 </head>
 
 <body>
-
 <div class="container">
 
-<h1>⚡ Solar System Design Tool</h1>
+<h1>⚡ Solar Simulation Tool</h1>
 
-<!-- SOLAR -->
 <div class="box">
-<h2>☀️ Solar</h2>
-
-<div class="input-group">
-<input type="number" id="load" placeholder="โหลดไฟ">
-<span>kWh/วัน</span>
+<h2>🌍 Location</h2>
+<div class="input-group"><input id="lat" placeholder="Latitude"><span>°</span></div>
+<div class="input-group"><input id="lon" placeholder="Longitude"><span>°</span></div>
 </div>
 
-<div class="input-group">
-<input type="number" id="sun" value="5" placeholder="Peak Sun Hour">
-<span>hr/day</span>
-</div>
-
-<div class="input-group">
-<input type="number" id="panel" value="535" placeholder="กำลังแผง">
-<span>W</span>
-</div>
-
-<div class="input-group">
-<input type="number" id="eff" value="80" placeholder="Efficiency">
-<span>%</span>
-</div>
-
-<div class="input-group">
-<input type="number" id="stringSize" value="19" placeholder="แผง/สตริง">
-<span>panel</span>
-</div>
-
-</div>
-
-<!-- SYSTEM -->
 <div class="box">
-<h2>🔋 System</h2>
-
-<div class="input-group">
-<select id="systemType">
-<option value="off">Off-grid</option>
-<option value="on">On-grid</option>
-<option value="hybrid">Hybrid</option>
-</select>
-<span>mode</span>
+<h2>☀️ System</h2>
+<div class="input-group"><input id="panel" value="535"><span>W</span></div>
+<div class="input-group"><input id="area" value="1000"><span>m²</span></div>
+<div class="input-group"><input id="eff" value="80"><span>%</span></div>
 </div>
 
-<div class="input-group">
-<input type="number" id="voltage" value="48" placeholder="แรงดันแบต">
-<span>V</span>
-</div>
-
-<div class="input-group">
-<input type="number" id="backup" value="5" placeholder="สำรองไฟ">
-<span>hr</span>
-</div>
-
-<div class="input-group">
-<input type="number" id="dod" value="80" placeholder="DOD">
-<span>%</span>
-</div>
-
-</div>
-
-<!-- CABLE -->
 <div class="box">
-<h2>🔌 Cable</h2>
-
-<div class="input-group">
-<input type="number" id="distance" value="20" placeholder="ระยะสาย">
-<span>m</span>
+<h2>⚡ Loss</h2>
+<div class="input-group"><input id="tempLoss" value="5"><span>% Temp</span></div>
+<div class="input-group"><input id="soilingLoss" value="3"><span>% Dust</span></div>
+<div class="input-group"><input id="invLoss" value="4"><span>% Inverter</span></div>
 </div>
 
-</div>
-
-<!-- FINANCE -->
 <div class="box">
 <h2>💰 Financial</h2>
-
-<div class="input-group">
-<input type="number" id="price" value="4" placeholder="ค่าไฟ">
-<span>บาท/kWh</span>
+<div class="input-group"><input id="price" value="4"><span>บาท/kWh</span></div>
+<div class="input-group"><input id="cost" value="1000000"><span>บาท</span></div>
 </div>
 
-<div class="input-group">
-<input type="number" id="cost" placeholder="ค่าติดตั้ง">
-<span>บาท</span>
-</div>
-
-</div>
-
-<button onclick="calc()">⚡ คำนวณระบบ</button>
+<button onclick="calc()">⚡ Run Simulation</button>
 
 <div class="box">
 <h2>📊 Result</h2>
-<div class="result" id="result"></div>
+<div id="result"></div>
+</div>
+
+<div class="box">
+<canvas id="chart"></canvas>
 </div>
 
 </div>
 
 <script>
-function calc() {
 
-let load = +document.getElementById("load").value;
-let sun = +document.getElementById("sun").value;
-let panel = +document.getElementById("panel").value;
-let eff = +document.getElementById("eff").value / 100;
-let stringSize = +document.getElementById("stringSize").value;
-
-let voltage = +document.getElementById("voltage").value;
-let backup = +document.getElementById("backup").value;
-let dod = +document.getElementById("dod").value / 100;
-
-let distance = +document.getElementById("distance").value;
-
-let price = +document.getElementById("price").value;
-let cost = +document.getElementById("cost").value;
-
-let systemType = document.getElementById("systemType").value;
-
-// ===== SOLAR =====
-let systemKW = (load / sun) / eff;
-let panels = (systemKW * 1000) / panel;
-let strings = panels / stringSize;
-
-// ===== BATTERY =====
-let batteryAh = 0;
-let batteryCount = 0;
-
-if(systemType !== "on") {
-    batteryAh = (load * 1000 * backup) / (voltage * dod);
-    batteryCount = batteryAh / 100;
+async function getSolar(lat, lon){
+let url = `https://power.larc.nasa.gov/api/temporal/monthly/point?parameters=ALLSKY_SFC_SW_DWN&community=RE&longitude=${lon}&latitude=${lat}&format=JSON`;
+let res = await fetch(url);
+let data = await res.json();
+return data.properties.parameter.ALLSKY_SFC_SW_DWN;
 }
 
-// ===== INVERTER =====
-let inverterKW = systemKW * 1.2;
-let acCurrent = (inverterKW * 1000) / 230;
+async function calc(){
 
-// ===== CABLE =====
-let dcCable = 0;
-if(systemType !== "on") {
-    let dcCurrent = (systemKW * 1000) / voltage;
-    let vdropDC = voltage * 0.03;
-    dcCable = (2 * distance * dcCurrent) / (56 * vdropDC);
-}
+let lat = document.getElementById("lat").value;
+let lon = document.getElementById("lon").value;
 
-let vdropAC = 230 * 0.03;
-let acCable = (2 * distance * acCurrent) / (56 * vdropAC);
+let panel = document.getElementById("panel").value;
+let area = document.getElementById("area").value;
+let eff = document.getElementById("eff").value/100;
+
+let tempLoss = document.getElementById("tempLoss").value/100;
+let soilingLoss = document.getElementById("soilingLoss").value/100;
+let invLoss = document.getElementById("invLoss").value/100;
+
+let price = document.getElementById("price").value;
+let cost = document.getElementById("cost").value;
+
+// ===== NASA DATA =====
+let solar = await getSolar(lat, lon);
+
+// ===== MONTHLY CALC =====
+let months = Object.keys(solar);
+let energyMonthly = [];
+
+let totalYear = 0;
+
+months.forEach(m => {
+
+let irr = solar[m]; // kWh/m2/day
+
+let energy = irr * area * eff;
+
+// Loss
+energy *= (1 - tempLoss);
+energy *= (1 - soilingLoss);
+energy *= (1 - invLoss);
+
+energyMonthly.push(energy.toFixed(0));
+totalYear += energy;
+
+});
+
+// ===== PR =====
+let PR = (1 - tempLoss - soilingLoss - invLoss);
 
 // ===== FINANCE =====
-let yearly = load * 365;
-let saving = yearly * price;
+let saving = totalYear * price;
 let roi = cost / saving;
 
 // ===== RESULT =====
 document.getElementById("result").innerHTML =
 
-"☀️ ระบบ: <b>" + systemType.toUpperCase() + "</b><br><br>" +
+"📍 Location: " + lat + ", " + lon + "<br><br>" +
 
-"🔋 Solar<br>" +
-"ขนาด: " + systemKW.toFixed(2) + " kW<br>" +
-"แผง: " + Math.ceil(panels) + "<br>" +
-"String: " + Math.ceil(strings) + "<br><br>" +
+"⚡ Annual Energy: " + totalYear.toFixed(0) + " kWh<br>" +
+"📈 PR: " + (PR*100).toFixed(1) + "%<br>" +
 
-(systemType !== "on" ?
-"🔋 Battery<br>" +
-"ความจุ: " + batteryAh.toFixed(0) + " Ah<br>" +
-"แบต 100Ah: " + Math.ceil(batteryCount) + "<br><br>"
-: "") +
+"💰 Saving/year: " + saving.toFixed(0) + " บาท<br>" +
+"⏳ ROI: " + roi.toFixed(1) + " ปี";
 
-"⚡ Inverter<br>" +
-"ขนาด: " + inverterKW.toFixed(2) + " kW<br>" +
-"กระแส: " + acCurrent.toFixed(2) + " A<br><br>" +
-
-"🔌 Cable<br>" +
-"DC: " + dcCable.toFixed(2) + " sq.mm<br>" +
-"AC: " + acCable.toFixed(2) + " sq.mm<br><br>" +
-
-"💰 Financial<br>" +
-"ประหยัด/ปี: " + saving.toFixed(0) + " บาท<br>" +
-"คืนทุน: " + roi.toFixed(1) + " ปี";
+// ===== CHART =====
+new Chart(document.getElementById("chart"), {
+type: 'bar',
+data: {
+labels: months,
+datasets: [{
+label: 'kWh/month',
+data: energyMonthly
+}]
 }
+});
+
+}
+
 </script>
 
 </body>
