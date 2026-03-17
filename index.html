@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>⚡ Solar Pro Ultimate - Master Background Edition</title>
+    <title>⚡ Solar Pro Command Center v10.0</title>
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -12,280 +12,234 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
 
     <style>
-        :root { --primary: #10b981; --secondary: #6366f1; --bg-overlay: rgba(15, 23, 42, 0.7); --card-bg: rgba(30, 41, 59, 0.5); --text: #f1f5f9; }
-        
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Kanit:wght@300;500;700&display=swap');
+
+        :root { 
+            --neon-blue: #00f2fe; --neon-green: #00ff87; --danger: #ff4b2b;
+            --glass: rgba(15, 23, 42, 0.85); --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
         body { 
-            font-family: 'Inter', sans-serif; 
-            margin: 0; 
-            padding: 20px; 
-            color: var(--text);
-            /* 👉 แก้ไขจุดนี้: เพิ่มภาพพื้นหลัง UI 👈 */
-            background-image: url('image_0.png'); 
-            background-size: cover;
-            background-attachment: fixed;
-            background-position: center;
+            margin: 0; padding: 20px; font-family: 'Kanit', sans-serif; color: #e2e8f0;
+            background: url('image_0.png') no-repeat center center fixed; background-size: cover;
         }
 
-        .main-container {
-            max-width: 1400px;
-            margin: auto;
-            padding: 20px;
-            background: var(--bg-overlay);
-            border-radius: 20px;
-            /* 👉 แก้ไขจุดนี้: เอฟเฟกต์เบลอพื้นหลัง 👈 */
-            backdrop-filter: blur(8px); 
+        /* Layout Structure */
+        .dashboard { display: grid; grid-template-columns: 380px 1fr; gap: 20px; max-width: 1600px; margin: auto; }
+
+        /* Left Sidebar UI */
+        .sidebar { display: flex; flex-direction: column; gap: 20px; }
+        .glass-panel { 
+            background: var(--glass); backdrop-filter: blur(15px); 
+            border: 1px solid var(--glass-border); border-radius: 20px; padding: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
         }
 
-        .card { 
-            background: var(--card-bg); 
-            padding: 20px; 
-            border-radius: 16px; 
-            border: 1px solid rgba(255, 255, 255, 0.1); 
-            margin-bottom: 20px; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        }
+        /* Section Styling */
+        h2 { color: var(--neon-blue); font-size: 0.9rem; text-transform: uppercase; margin: 0 0 15px 0; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--glass-border); padding-bottom: 10px; }
         
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
-        
-        header h1 { color: var(--primary); text-transform: uppercase; letter-spacing: 1px; }
-
-        #map { height: 400px; border-radius: 16px; border: 2px solid rgba(255, 255, 255, 0.1); margin-bottom: 20px; }
-
+        .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .input-group { margin-bottom: 12px; }
-        label { display: block; font-size: 0.7rem; color: #94a3b8; margin-bottom: 4px; text-transform: uppercase; font-weight: bold; }
-        .field-box { display: flex; background: rgba(0, 0, 0, 0.3); border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.1); overflow: hidden; }
-        .field-box input, .field-box select, .field-box textarea { flex: 1; background: transparent; border: none; color: white; padding: 10px; outline: none; width: 100%; }
-        .field-box input:focus, .field-box select:focus { background: rgba(16, 185, 129, 0.1); }
-        .field-box span { background: rgba(255, 255, 255, 0.05); padding: 10px; font-size: 0.75rem; min-width: 50px; text-align: center; color: #cbd5e1; }
-
-        .btn-group { display: flex; gap: 15px; margin: 20px 0; }
-        button { flex: 1; padding: 16px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; transition: 0.2s; font-size: 1rem; text-transform: uppercase; letter-spacing: 0.5px; }
-        .btn-calc { background: linear-gradient(135deg, var(--secondary), var(--primary)); color: #064e3b; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.2); }
-        .btn-pdf { background: rgba(255, 255, 255, 0.1); color: white; border: 1px solid rgba(255, 255, 255, 0.1); }
-        button:hover { transform: translateY(-2px); filter: brightness(1.1); box-shadow: 0 6px 15px rgba(0,0,0,0.3); }
-
-        #result-panel { font-family: monospace; font-size: 0.9rem; color: #5eead4; background: rgba(0, 0, 0, 0.4); padding: 20px; border-radius: 12px; border-left: 5px solid var(--primary); min-height: 150px; }
+        label { display: block; font-size: 0.65rem; color: #94a3b8; margin-bottom: 4px; font-weight: bold; }
         
-        .chart-container { position: relative; height: 350px; width: 100%; background: rgba(0, 0, 0, 0.3); border-radius: 16px; padding: 10px; }
+        .field { 
+            background: rgba(0,0,0,0.4); border: 1px solid var(--glass-border); 
+            border-radius: 8px; display: flex; overflow: hidden; transition: 0.2s;
+        }
+        .field:focus-within { border-color: var(--neon-blue); box-shadow: 0 0 8px rgba(0, 242, 254, 0.3); }
+        .field input, .field select { flex: 1; background: transparent; border: none; color: #fff; padding: 10px; outline: none; font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; }
+        .field span { background: rgba(255,255,255,0.05); padding: 10px; font-size: 0.65rem; color: #64748b; min-width: 40px; text-align: center; border-left: 1px solid var(--glass-border); }
+
+        /* Main Content UI */
+        .main-content { display: flex; flex-direction: column; gap: 20px; }
+        #map { height: 300px; border-radius: 20px; border: 1px solid var(--glass-border); }
+
+        .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
+        .stat-card { background: rgba(0,0,0,0.3); border-radius: 15px; padding: 15px; border: 1px solid var(--glass-border); text-align: center; }
+        .stat-label { font-size: 0.65rem; color: #94a3b8; text-transform: uppercase; }
+        .stat-value { font-family: 'JetBrains Mono', monospace; font-size: 1.2rem; color: #fff; margin-top: 5px; }
+
+        .btn-primary { background: linear-gradient(135deg, #00c6ff, #0072ff); color: white; border: none; padding: 15px; border-radius: 12px; font-weight: bold; cursor: pointer; text-transform: uppercase; margin-top: 10px; width: 100%; transition: 0.3s; }
+        .btn-pdf { background: rgba(255,255,255,0.1); border: 1px solid var(--glass-border); color: #fff; }
+        .btn:hover { transform: translateY(-2px); filter: brightness(1.2); }
+
+        .validation-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.85rem; }
+        .status-ok { color: var(--neon-green); font-weight: bold; }
+        .status-warn { color: var(--danger); font-weight: bold; }
+
+        #chart-wrap { height: 350px; margin-top: 10px; }
     </style>
 </head>
 <body>
 
-<div class="main-container">
-    <header style="text-align: center;">
-        <h1>⚡ Solar Pro <span style="color:white">Ultimate Suite</span></h1>
-        <p style="color:#94a3b8; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px;">Engineering Design & Financial Analysis</p>
-    </header>
-
-    <div id="map"></div>
-
-    <div class="grid">
-        <div class="card">
-            <h2>☀️ PV Module Design</h2>
+<div class="dashboard">
+    <div class="sidebar">
+        <div class="glass-panel">
+            <h1 style="font-size: 1.5rem; margin:0; color:#fff; letter-spacing:-1px;">SOLAR <span style="color:var(--neon-blue)">COMMAND</span></h1>
+            <p style="font-size: 0.65rem; color:#94a3b8; margin-bottom: 20px;">ENGINEERING CONTROL UNIT V10.0</p>
+            
+            <h2>☀️ MODULE PARAMETERS</h2>
             <div class="input-group">
-                <label>แบรนด์/รุ่น</label>
-                <div class="field-box">
-                    <select id="panelDb" onchange="updatePanelSpecs()">
-                        <option value="custom">-- Custom --</option>
-                        <option value="jinko550">Jinko 550W</option>
-                        <option value="longi545">LONGi 545W</option>
+                <label>Database Presets</label>
+                <div class="field">
+                    <select id="pSel" onchange="applyPreset()">
+                        <option value="custom">-- Custom Specification --</option>
+                        <option value="jinko550">Jinko Tiger Pro 550W</option>
+                        <option value="longi545">LONGi Hi-MO 5 545W</option>
                     </select>
                 </div>
             </div>
-            <div class="grid" style="grid-template-columns: 1fr 1fr; gap: 10px;">
-                <div class="input-group"><label>Pmax (Wp)</label><div class="field-box"><input id="pWp" value="550"></div></div>
-                <div class="input-group"><label>Voc (V)</label><div class="field-box"><input id="pVoc" value="49.8"></div></div>
-                <div class="input-group"><label>จำนวน (แผง)</label><div class="field-box"><input id="pQty" value="20"></div></div>
-                <div class="input-group"><label>String</label><div class="field-box"><input id="pStr" value="10"></div></div>
+            <div class="input-grid">
+                <div class="input-group"><label>Pmax (Wp)</label><div class="field"><input id="pWp" value="550"></div></div>
+                <div class="input-group"><label>Voc (V)</label><div class="field"><input id="pVoc" value="49.8"></div></div>
+                <div class="input-group"><label>Vmp (V)</label><div class="field"><input id="pVmp" value="41.9"></div></div>
+                <div class="input-group"><label>Isc (A)</label><div class="field"><input id="pIsc" value="13.9"></div></div>
+            </div>
+            <div class="input-grid">
+                <div class="input-group"><label>Quantity</label><div class="field"><input id="pQty" value="20"><span>PCS</span></div></div>
+                <div class="input-group"><label>Series/Str</label><div class="field"><input id="pStr" value="10"><span>SER</span></div></div>
+            </div>
+
+            <h2>🔌 INVERTER SETUP</h2>
+            <div class="input-group"><label>Max Input Voltage</label><div class="field"><input id="invMaxV" value="1100"><span>VDC</span></div></div>
+            <div class="input-grid">
+                <div class="input-group"><label>MPPT Min</label><div class="field"><input id="invMinM" value="160"></div></div>
+                <div class="input-group"><label>MPPT Max</label><div class="field"><input id="invMaxM" value="950"></div></div>
+            </div>
+
+            <button class="btn-primary" onclick="calculate()">🚀 RUN SIMULATION</button>
+            <button class="btn-primary btn-pdf" style="margin-top:10px" onclick="exportPDF()">📄 GENERATE REPORT</button>
+        </div>
+
+        <div class="glass-panel">
+            <h2>🛡️ SAFETY VALIDATION</h2>
+            <div id="vLogs">
+                <div class="validation-item"><span>Voltage Safety</span><span class="status-ok">READY</span></div>
+                <div class="validation-item"><span>MPPT Optimization</span><span class="status-ok">READY</span></div>
             </div>
         </div>
-
-        <div class="card">
-            <h2>🔌 Inverter Design</h2>
-            <div class="input-group"><label>Max DC Input (V)</label><div class="field-box"><input id="invMaxV" value="1100"><span>V</span></div></div>
-            <div class="input-group"><label>MPPT Range (V)</label><div class="field-box"><input id="invMinV" value="160"><input id="invMaxV_MPPT" value="950"></div></div>
-            <div class="input-group"><label>Efficiency (%)</label><div class="field-box"><input id="invEff" value="98.5"><span>%</span></div></div>
-        </div>
-
-        <div class="card">
-            <h2>📄 Project Customization</h2>
-            <div class="input-group"><label>ชื่อลูกค้า</label><div class="field-box"><input id="custName" placeholder="Customer Name"></div></div>
-            <div class="input-group"><label>CAPEX (งบติดตั้ง)</label><div class="field-box"><input id="totalCost" value="350000"><span>฿</span></div></div>
-            <div class="input-group"><label>หมายเหตุ</label><div class="field-box"><textarea id="notes" rows="2"></textarea></div></div>
-        </div>
     </div>
 
-    <div class="btn-group">
-        <button class="btn-calc" onclick="runAnalysis()">🚀 RUN ANALYSIS</button>
-        <button class="btn-pdf" onclick="exportPDF()">📄 EXPORT PDF</button>
-    </div>
+    <div class="main-content">
+        <div id="map"></div>
 
-    <div class="grid" style="grid-template-columns: 1fr 1.5fr;">
-        <div class="card">
-            <h2>📝 Executive Summary</h2>
-            <div id="result-panel">Waiting for calculation...</div>
+        <div class="stat-grid">
+            <div class="stat-card"><div class="stat-label">System Size</div><div class="stat-value" id="resSize">0.00 <small>kWp</small></div></div>
+            <div class="stat-card"><div class="stat-label">Est. Annual Yield</div><div class="stat-value" id="resYield">0 <small>kWh</small></div></div>
+            <div class="stat-card"><div class="stat-label">Annual Saving</div><div class="stat-value" id="resSave">฿ 0</div></div>
+            <div class="stat-card"><div class="stat-label">ROI Period</div><div class="stat-value" id="resROI">0 <small>Yrs</small></div></div>
         </div>
-        <div class="card">
-            <h2>📈 Yield & Financial Chart</h2>
-            <div class="chart-container">
+
+        <div class="glass-panel">
+            <h2>📊 PRODUCTION FORECAST (25-YEAR LIFESPAN)</h2>
+            <div id="chart-wrap">
                 <canvas id="yieldChart"></canvas>
+            </div>
+        </div>
+        
+        <div class="glass-panel">
+            <h2>🏢 PROJECT INFORMATION</h2>
+            <div class="input-grid">
+                <div class="input-group"><label>Customer Name</label><div class="field"><input id="custName" placeholder="Client Name"></div></div>
+                <div class="input-group"><label>Project Budget</label><div class="field"><input id="totalCost" value="350000"><span>THB</span></div></div>
             </div>
         </div>
     </div>
 </div>
 
-<input type="hidden" id="lat" value="13.75"><input type="hidden" id="lon" value="100.5">
-
 <script>
-let map, marker, chartInstance = null;
-let calculationResult = null;
+let chart, map, marker;
 
-// Initialize Map
 window.onload = () => {
     map = L.map('map').setView([13.75, 100.5], 6);
-    // Darker map tiles to blend with the background theme
     L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);
-    marker = L.marker([13.75, 100.5], {draggable: true}).addTo(map);
-    
-    map.on('click', e => updateLocation(e.latlng.lat, e.latlng.lng));
-    marker.on('dragend', e => updateLocation(e.target.getLatLng().lat, e.target.getLatLng().lng));
+    marker = L.marker([13.75, 100.5], {draggable:true}).addTo(map);
+    calculate(); // Initial Run
 };
 
-function updateLocation(lat, lng) {
-    document.getElementById('lat').value = lat.toFixed(4);
-    document.getElementById('lon').value = lng.toFixed(4);
-    marker.setLatLng([lat, lng]);
-}
-
-function updatePanelSpecs() {
-    const db = { jinko550: [550, 49.8], longi545: [545, 49.5] };
-    const choice = document.getElementById('panelDb').value;
-    if(db[choice]) {
-        document.getElementById('pWp').value = db[choice][0];
-        document.getElementById('pVoc').value = db[choice][1];
+function applyPreset() {
+    const data = { jinko550: [550, 49.8, 41.9, 13.9], longi545: [545, 49.5, 41.6, 13.8] };
+    let c = data[document.getElementById('pSel').value];
+    if(c) {
+        ['pWp','pVoc','pVmp','pIsc'].forEach((id, i) => document.getElementById(id).value = c[i]);
     }
 }
 
-async function runAnalysis() {
-    const v = id => parseFloat(document.getElementById(id).value) || 0;
+function calculate() {
+    const v = (id) => parseFloat(document.getElementById(id).value) || 0;
     
-    // Engineering
-    const sysKWp = (v('pWp') * v('pQty')) / 1000;
+    const size = (v('pWp') * v('pQty')) / 1000;
     const strVoc = v('pVoc') * v('pStr');
-    const isSafe = strVoc <= v('invMaxV');
+    const strVmp = v('pVmp') * v('pStr');
     
-    // Monthly Calculation (HSP Data)
-    const hsp = [5.1, 5.5, 5.9, 6.2, 5.4, 5.0, 4.8, 4.7, 4.6, 5.0, 5.1, 5.1];
-    const energyPrice = 4.7;
-    const pr = (v('invEff')/100) * 0.81;
+    // Detailed Engineering Losses
+    const tempLoss = 0.12; // 12% loss for Thai heat
+    const otherLoss = 0.08; // 8% Wiring/Dust
+    const pr = 0.98 * (1 - tempLoss) * (1 - otherLoss);
     
-    let monthlyYield = hsp.map(h => (h * sysKWp * pr * 30.4).toFixed(1));
-    let monthlySaving = monthlyYield.map(y => (y * energyPrice).toFixed(0));
-    let yearlySum = monthlyYield.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
-    let yearlySaving = yearlySum * energyPrice;
+    const yearlyKwh = size * 5.1 * 365 * pr;
+    const saving = yearlyKwh * 4.7;
+    const roi = v('totalCost') / saving;
 
-    // Update UI
-    const safetyBadge = isSafe ? '<span style="color:var(--primary); font-weight: bold;">SAFE ✅</span>' : '<span style="color:#ef4444; font-weight: bold;">❌ OVERVOLT (DANGER)</span>';
-    document.getElementById('result-panel').innerHTML = `
-        <b style="color:var(--text); text-transform: uppercase;">[SYSTEM DESIGN VALIDATION]</b><br>
-        Capacity: ${sysKWp.toFixed(2)} kWp<br>
-        String Voc: ${strVoc.toFixed(1)}V (${safetyBadge})<br>
-        <hr style="border:0; border-top:1px solid rgba(255,255,255,0.1); margin:10px 0">
-        <b style="color:var(--text); text-transform: uppercase;">[ESTIMATED PERFORMANCE]</b><br>
-        Yearly Generation: ${yearlySum.toLocaleString(undefined, {maximumFractionDigits: 0})} kWh<br>
-        Yearly Saving: ฿${yearlySaving.toLocaleString(undefined, {maximumFractionDigits: 0})}<br>
-        Estimated Payback: ${(v('totalCost') / yearlySaving).toFixed(1)} Years
+    // Update Stats
+    document.getElementById('resSize').innerHTML = `${size.toFixed(2)} <small>kWp</small>`;
+    document.getElementById('resYield').innerHTML = `${Math.round(yearlyKwh).toLocaleString()} <small>kWh</small>`;
+    document.getElementById('resSave').innerHTML = `฿ ${Math.round(saving).toLocaleString()}`;
+    document.getElementById('resROI').innerHTML = `${roi.toFixed(1)} <small>Yrs</small>`;
+
+    // Validation Logic
+    const voltOk = strVoc < v('invMaxV');
+    const mpptOk = strVmp > v('invMinM') && strVmp < v('invMaxM');
+    
+    document.getElementById('vLogs').innerHTML = `
+        <div class="validation-item"><span>Voltage Safety (Voc: ${strVoc.toFixed(1)}V)</span><span class="${voltOk?'status-ok':'status-warn'}">${voltOk?'✅ PASS':'❌ OVER'}</span></div>
+        <div class="validation-item"><span>MPPT Operating (Vmp: ${strVmp.toFixed(1)}V)</span><span class="${mpptOk?'status-ok':'status-warn'}">${mpptOk?'✅ OPTIMAL':'❌ RANGE'}</span></div>
     `;
 
-    calculationResult = { sysKWp, strVoc, isSafe, monthlyYield, monthlySaving, yearlySum, yearlySaving };
-    renderChart(monthlyYield, monthlySaving);
+    updateChart(yearlyKwh);
 }
 
-function renderChart(yieldData, savingData) {
+function updateChart(base) {
     const ctx = document.getElementById('yieldChart').getContext('2d');
+    if(chart) chart.destroy();
     
-    // Destroy previous instance to fix problematic updates
-    if (chartInstance) {
-        chartInstance.destroy();
+    let labels = [], data = [];
+    for(let i=1; i<=25; i++) {
+        labels.push("Year " + i);
+        data.push((base * Math.pow(0.995, i-1)).toFixed(0));
     }
 
-    chartInstance = new Chart(ctx, {
-        type: 'bar',
+    chart = new Chart(ctx, {
+        type: 'line',
         data: {
-            labels: ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
-            datasets: [
-                {
-                    label: 'พลังงาน (kWh)',
-                    data: yieldData,
-                    backgroundColor: 'rgba(16, 185, 129, 0.7)', // Green with transparency
-                    yAxisID: 'y',
-                    borderRadius: 5
-                },
-                {
-                    label: 'เงินประหยัด (฿)',
-                    data: savingData,
-                    type: 'line',
-                    borderColor: '#6366f1', // Blue-Indigo
-                    borderWidth: 3,
-                    tension: 0.4, // Smoother line
-                    yAxisID: 'y1',
-                    pointRadius: 3,
-                    pointBackgroundColor: 'white'
-                }
-            ]
+            labels: labels,
+            datasets: [{
+                label: 'Production (kWh)', data: data,
+                borderColor: '#00f2fe', backgroundColor: 'rgba(0, 242, 254, 0.1)',
+                fill: true, tension: 0.4, borderWidth: 3, pointRadius: 0
+            }]
         },
         options: {
-            responsive: true,
-            maintainAspectRatio: false,
+            responsive: true, maintainAspectRatio: false,
             scales: {
-                y: { type: 'linear', position: 'left', title: { display: true, text: 'k Wh', color: '#10b981' }, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#cbd5e1' } },
-                y1: { type: 'linear', position: 'right', grid: { drawOnChartArea: false }, title: { display: true, text: '฿ Baht', color: '#6366f1' }, ticks: { color: '#cbd5e1' } }
+                y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#64748b' } },
+                x: { grid: { display: false }, ticks: { color: '#64748b' } }
             },
-            plugins: {
-                legend: { labels: { color: '#f1f5f9' } }
-            }
+            plugins: { legend: { display: false } }
         }
     });
 }
 
 function exportPDF() {
-    if(!calculationResult) return alert("Please run analysis first!");
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
-    const capex = parseFloat(document.getElementById('totalCost').value);
-
-    // Header with primary color
-    doc.setFillColor(15, 23, 42); // Match bg overlay color
+    doc.setFillColor(15, 23, 42);
     doc.rect(0, 0, 210, 40, 'F');
-    doc.setTextColor(16, 185, 129); // Primary green
-    doc.setFontSize(24);
-    doc.setFont("helvetica", "bold");
-    doc.text("SOLAR PRO PROJECT REPORT", 20, 25);
-    
-    // Data Table with striped theme
-    doc.autoTable({
-        startY: 50,
-        head: [['Engineering & Financial Metrics', 'Value']],
-        body: [
-            ['Customer Name', document.getElementById('custName').value || 'Customer'],
-            ['System Capacity', calculationResult.sysKWp.toFixed(2) + ' kWp'],
-            ['Voltage Check (Voc)', calculationResult.strVoc.toFixed(1) + ' V (' + (calculationResult.isSafe ? 'PASS':'FAIL') + ')'],
-            ['CAPEX (Investment)', '฿' + capex.toLocaleString()],
-            ['Estimated Annual Saving', '฿' + calculationResult.yearlySaving.toLocaleString()],
-            ['Payback Period', (capex / calculationResult.yearlySaving).toFixed(1) + ' Years'],
-            ['Total Saving (25 Years)', '฿' + (calculationResult.yearlySaving * 25).toLocaleString()]
-        ],
-        theme: 'striped', 
-        headStyles: { fillColor: [15, 23, 42], textColor: [255, 255, 255] },
-        bodyStyles: { font: "helvetica" },
-        columnStyles: { 0: { fontStyle: "bold", width: 90 }, 1: { halign: "right" } }
-    });
-
-    // Save with customer name
-    const clientName = document.getElementById('custName').value || 'Project';
-    doc.save(`Solar_Pro_Report_${clientName}.pdf`);
+    doc.setTextColor(0, 242, 254);
+    doc.setFontSize(22);
+    doc.text("SOLAR ENGINEERING MASTER REPORT", 15, 25);
+    doc.save("Solar_Master_Report.pdf");
 }
 </script>
-
 </body>
 </html>
