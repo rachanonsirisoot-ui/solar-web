@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>⚡ Solar Pro Master Background Edition v11.0</title>
+    <title>⚡ Solar Master - Blue Edition v12.0</title>
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -12,275 +12,257 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Kanit:wght@300;500;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Kanit:wght@300;500;700&display=swap');
 
         :root { 
-            --primary: #10b981; --secondary: #6366f1; --danger: #ef4444;
-            --glass: rgba(15, 23, 42, 0.75); --glass-border: rgba(255, 255, 255, 0.1);
+            --primary-blue: #1e3a8a; /* Deep Blue */
+            --accent-cyan: #06b6d4;
+            --success-green: #10b981;
+            --danger-red: #ef4444;
+            --glass-blue: rgba(30, 58, 138, 0.85); /* Glass Blue Overlay */
         }
 
         body { 
-            margin: 0; padding: 20px; font-family: 'Kanit', sans-serif; color: #f1f5f9;
-            /* 👉 แก้ไขจุดนี้: ใส่ภาพพื้นหลังของคุณ 👈 */
-            background: url('image_0.png') no-repeat center center fixed; background-size: cover;
+            margin: 0; padding: 20px; font-family: 'Kanit', sans-serif; color: #f8fafc;
+            /* พื้นหลังเป็นรูปภาพ แต่ซ้อนทับด้วยสีน้ำเงินเข้มเพื่อให้ตัวหนังสือเด่น */
+            background: linear-gradient(rgba(15, 23, 42, 0.8), rgba(30, 58, 138, 0.8)), url('image_0.png');
+            background-size: cover; background-attachment: fixed; background-position: center;
         }
 
-        .container { max-width: 1450px; margin: auto; }
-        
-        /* UI สไตล์ Glassmorphism (โปร่งแสงและเบลอ) */
-        .glass-card { 
-            background: var(--glass); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border); border-radius: 20px; padding: 25px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.4); margin-bottom: 25px;
+        .container { max-width: 1400px; margin: auto; }
+
+        /* Glass Panel Styling */
+        .panel { 
+            background: var(--glass-blue); backdrop-filter: blur(12px); 
+            border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4); margin-bottom: 20px;
         }
 
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 25px; }
-        
-        h2 { color: var(--primary); font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px; margin: 0 0 20px 0; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--glass-border); padding-bottom: 10px; }
-        
-        label { display: block; font-size: 0.7rem; color: #94a3b8; margin: 10px 0 5px; text-transform: uppercase; font-weight: bold; }
-        
-        .field-box { display: flex; background: rgba(0,0,0,0.3); border-radius: 10px; border: 1px solid var(--glass-border); overflow: hidden; margin-bottom: 5px; }
-        .field-box input, .field-box select, .field-box textarea { flex: 1; background: transparent; border: none; color: white; padding: 12px; outline: none; font-size: 0.95rem; }
-        .field-box span { background: rgba(255,255,255,0.05); padding: 12px; font-size: 0.75rem; min-width: 55px; text-align: center; color: #94a3b8; border-left: 1px solid var(--glass-border); }
+        h2 { color: var(--accent-cyan); font-size: 1rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; border-left: 4px solid var(--accent-cyan); padding-left: 10px; }
 
-        .btn-add { background: var(--secondary); color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; width: 100%; margin-top: 10px; }
-        .btn-calc { background: linear-gradient(135deg, var(--secondary), var(--primary)); color: #064e3b; padding: 18px; font-size: 1.1rem; width: 100%; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; margin-top: 20px; text-transform: uppercase; letter-spacing: 1px; }
-        .btn-pdf { background: rgba(255, 255, 255, 0.1); color: white; border: 1px solid var(--glass-border); border-radius: 12px; }
-        .btn:hover { transform: translateY(-3px); filter: brightness(1.1); box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
-
-        #validate-panel { font-family: 'Inter', sans-serif; font-size: 0.9rem; line-height: 1.7; color: #f1f5f9; background: #020617; }
-        .status-pill { padding: 3px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: bold; margin-left: 10px; text-transform: uppercase; }
-        .pass { background: rgba(16, 185, 129, 0.2); color: var(--primary); border: 1px solid var(--primary); }
-        .fail { background: rgba(239, 68, 68, 0.2); color: var(--danger); border: 1px solid var(--danger); }
+        .grid-inputs { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
         
-        #map { height: 350px; border-radius: 20px; margin-bottom: 25px; border: 1px solid var(--glass-border); }
+        /* Input Form Elements */
+        label { display: block; font-size: 0.75rem; color: #cbd5e1; margin-bottom: 6px; font-weight: bold; }
+        .input-field { 
+            display: flex; background: rgba(15, 23, 42, 0.5); border: 1px solid rgba(255, 255, 255, 0.2); 
+            border-radius: 8px; overflow: hidden; margin-bottom: 10px;
+        }
+        .input-field input, .input-field select { 
+            flex: 1; background: transparent; border: none; color: white; padding: 10px; outline: none; font-size: 0.9rem;
+        }
+        .input-field span { 
+            background: rgba(255,255,255,0.1); padding: 10px; font-size: 0.7rem; color: #94a3b8; min-width: 45px; text-align: center;
+        }
+
+        /* Buttons */
+        .btn { padding: 15px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; font-size: 1rem; }
+        .btn-calc { background: var(--accent-cyan); color: #0f172a; width: 100%; margin-top: 10px; }
+        .btn-pdf { background: transparent; border: 1px solid var(--accent-cyan); color: var(--accent-cyan); margin-top: 10px; }
+        .btn:hover { filter: brightness(1.2); transform: translateY(-2px); }
+
+        /* Dashboard Stats */
+        .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin: 20px 0; }
+        .stat-card { background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 15px; text-align: center; }
+        .stat-val { font-family: 'JetBrains Mono', monospace; font-size: 1.5rem; display: block; color: #fff; }
+        .stat-lbl { font-size: 0.7rem; color: #94a3b8; text-transform: uppercase; margin-top: 5px; }
+
+        #map { height: 300px; border-radius: 16px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.1); }
+        
+        .status { font-weight: bold; font-size: 0.8rem; padding: 2px 8px; border-radius: 4px; }
+        .status-pass { color: var(--success-green); background: rgba(16, 185, 129, 0.1); }
+        .status-fail { color: var(--danger-red); background: rgba(239, 68, 68, 0.1); }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <header style="text-align:center; padding: 20px 0;">
-        <h1 style="margin:0; font-family:'Inter',sans-serif; font-weight:800; color:white; font-size:2rem;">SOLAR <span style="color:var(--primary)">PRO</span> MASTER</h1>
-        <p style="margin:0; color:#94a3b8; font-size:0.9rem;">Engineering Design & Financial Analysis Dashboard v11.0</p>
+    <header style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+        <h1 style="margin:0; font-weight:800; font-size:1.5rem;">SOLAR MASTER <span style="color:var(--accent-cyan)">BLUE</span></h1>
+        <div style="font-size:0.8rem; text-align:right;">Engineering Suite v12.0<br><span id="dateTime"></span></div>
     </header>
-    
+
     <div id="map"></div>
 
-    <div class="grid">
-        <div class="glass-card">
-            <h2>☀️ PV MODULE SPECS</h2>
-            <div class="input-group">
-                <label>แบรนด์/รุ่น (Database)</label>
-                <div class="field-box">
-                    <select id="panelDb" onchange="loadPanelSpecs()">
-                        <option value="custom">-- CUSTOM / MANUAL --</option>
-                        <option value="jinko550">Jinko Tiger Pro 550W</option>
-                        <option value="longi545">LONGi Hi-MO 5 545W</option>
-                    </select>
-                </div>
+    <div class="grid-inputs">
+        <div class="panel">
+            <h2>☀️ MODULE SPECS</h2>
+            <label>Model Preset</label>
+            <div class="input-field">
+                <select id="pSel" onchange="applyPreset()">
+                    <option value="custom">-- CUSTOM / MANUAL --</option>
+                    <option value="jinko550">Jinko Tiger Pro 550W</option>
+                    <option value="longi545">LONGi Hi-MO 5 545W</option>
+                </select>
             </div>
-            
-            <div class="grid" style="grid-template-columns: 1fr 1fr; gap: 10px;">
-                <div><label>Pmax (Wp)</label><div class="field-box"><input id="pWp" value="550"></div></div>
-                <div><label>Voc (V)</label><div class="field-box"><input id="pVoc" value="49.8"></div></div>
-                <div><label>Isc (A)</label><div class="field-box"><input id="pIsc" value="13.9"></div></div>
-                <div><label>Vmp (V)</label><div class="field-box"><input id="pVmp" value="41.9"></div></div>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                <div><label>Pmax (Wp)</label><div class="input-field"><input id="pWp" value="550"></div></div>
+                <div><label>Voc (V)</label><div class="input-field"><input id="pVoc" value="49.8"></div></div>
+                <div><label>Isc (A)</label><div class="input-field"><input id="pIsc" value="13.9"></div></div>
+                <div><label>Vmp (V)</label><div class="input-field"><input id="pVmp" value="41.9"></div></div>
             </div>
-            
-            <div class="grid" style="grid-template-columns: 1fr 1fr; gap: 10px; margin-top:10px;">
-                <div><label>Total Panels</label><div class="field-box"><input id="pQty" value="20"></div></div>
-                <div><label>Panels/String</label><div class="field-box"><input id="pStr" value="10"></div></div>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                <div><label>Qty (Panels)</label><div class="input-field"><input id="pQty" value="20"></div></div>
+                <div><label>P/String</label><div class="input-field"><input id="pStr" value="10"></div></div>
             </div>
         </div>
 
-        <div class="glass-card">
+        <div class="panel">
             <h2>🔌 INVERTER SPECS</h2>
-            <div class="input-group"><label>Max DC Input Voltage</label><div class="field-box"><input id="invMaxV" value="1100"><span>Vdc</span></div></div>
-            <div class="input-group"><label>MPPT Range (Min - Max)</label><div class="field-box"><input id="invMinMppt" value="160"><input id="invMaxMppt" value="950"><span>Vdc</span></div></div>
-            <div class="input-group"><label>Max Input Current (Isc)</label><div class="field-box"><input id="invMaxI" value="15"><span>A</span></div></div>
-            <div class="input-group"><label>Efficiency</label><div class="field-box"><input id="invEff" value="98.5"><span>%</span></div></div>
+            <label>Max DC Input Voltage</label>
+            <div class="input-field"><input id="invMaxV" value="1100"><span>V</span></div>
+            <label>MPPT Range</label>
+            <div class="input-field"><input id="invMinM" value="160"><input id="invMaxM" value="950"><span>V</span></div>
+            <label>Max Input Current (per MPPT)</label>
+            <div class="input-field"><input id="invMaxI" value="15"><span>A</span></div>
+            <button class="btn btn-calc" onclick="calculate()">🚀 CALCULATE SYSTEM</button>
         </div>
 
-        <div class="glass-card" style="border-color: var(--secondary);">
-            <h2>📄 PROJECT & BRANDING</h2>
-            <div class="input-group"><label>Client Name</label><div class="field-box"><input id="custName" placeholder="ระบุชื่อลูกค้า"></div></div>
-            <div class="input-group"><label>Project Budget (CAPEX)</label><div class="field-box"><input id="totalCost" value="350000"><span>THB</span></div></div>
-            <div class="input-group"><label>Upload Logo (JPG/PNG)</label><div class="field-box"><input type="file" id="logoFile" accept="image/*" style="color:#94a3b8; padding:8px;"></div></div>
-            <div class="input-group"><label>Notes</label><div class="field-box"><textarea id="notes" rows="2" placeholder="Additional details..."></textarea></div></div>
+        <div class="panel">
+            <h2>📝 PROJECT INFO</h2>
+            <label>Client Name</label>
+            <div class="input-field"><input id="custName" placeholder="Client Name"></div>
+            <label>Project Budget (THB)</label>
+            <div class="input-field"><input id="totalCost" value="350000"></div>
+            <label>Branding Logo</label>
+            <input type="file" id="logoInp" style="font-size:0.7rem; color:#94a3b8;">
+            <button class="btn btn-pdf" onclick="exportPDF()">📄 EXPORT REPORT</button>
         </div>
     </div>
 
-    <div style="display:flex; gap:15px;">
-        <button class="btn btn-calc" onclick="runValidation()">🚀 EXECUTE SYSTEM VALIDATION</button>
-        <button class="btn btn-pdf" style="width:300px; margin-top:20px;" onclick="exportPDF()">📄 EXPORT PDF</button>
+    <div class="stat-grid">
+        <div class="stat-card"><span class="stat-lbl">System Size</span><span class="stat-val" id="resSize">0.00 <small>kWp</small></span></div>
+        <div class="stat-card"><span class="stat-lbl">Yearly Yield</span><span class="stat-val" id="resYield">0 <small>kWh</small></span></div>
+        <div class="stat-card"><span class="stat-lbl">Yearly Saving</span><span class="stat-val" id="resSave">฿ 0</span></div>
+        <div class="stat-card"><span class="stat-lbl">Payback Period</span><span class="stat-val" id="resROI">0.0 <small>Yrs</small></span></div>
     </div>
 
-    <div class="grid" style="grid-template-columns: 1fr 1.5fr; margin-top:25px;">
-        <div class="glass-card" id="validate-panel">
-            <h3 style="color:var(--primary); margin-top:0; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:10px;">Engineering Validation Report</h3>
-            พร้อมสำหรับการตรวจสอบระบบ...
+    <div class="grid-inputs" style="grid-template-columns: 1fr 2fr;">
+        <div class="panel">
+            <h2>🛡️ VALIDATION</h2>
+            <div id="vResult" style="font-size:0.85rem; line-height:1.8;">
+                Click Calculate to check system safety...
+            </div>
         </div>
-        <div class="glass-card">
-            <h2>📈 YIELD PERFORMANCE (25 YEARS)</h2>
-            <canvas id="yieldChart" style="height:350px;"></canvas>
+        <div class="panel">
+            <h2>📈 25-YEAR PERFORMANCE</h2>
+            <div style="height:300px;"><canvas id="mainChart"></canvas></div>
         </div>
     </div>
 </div>
 
 <script>
-let chart, map, marker, logoBase64 = null;
-let lastResult = null;
+let chart, map, marker, logoData = null;
 
-// Initialize Map & File Upload
 window.onload = () => {
     map = L.map('map').setView([13.75, 100.5], 6);
-    L.tileLayer('https://{s}.tile.thunderforest.com/transport-dark/{z}/{x}/{y}.png?apikey=h').addTo(map); // Dark map
-    marker = L.marker([13.75, 100.5], {draggable: true}).addTo(map);
-    map.on('click', e => updatePos(e.latlng.lat, e.latlng.lng));
-    marker.on('dragend', e => updatePos(e.target.getLatLng().lat, e.target.getLatLng().lng));
-
-    document.getElementById('logoFile').onchange = (e) => {
-        let r = new FileReader(); r.onload = (el) => logoBase64 = el.target.result;
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);
+    marker = L.marker([13.75, 100.5], {draggable:true}).addTo(map);
+    
+    document.getElementById('logoInp').onchange = (e) => {
+        let r = new FileReader(); r.onload = (el) => logoData = el.target.result;
         r.readAsDataURL(e.target.files[0]);
     };
-    runValidation(); // Initial calc
+    document.getElementById('dateTime').innerText = new Date().toLocaleString();
+    calculate();
 };
 
-function updatePos(lat, lng) { marker.setLatLng([lat, lng]); }
-
-function loadPanelSpecs() {
+function applyPreset() {
     const db = { jinko550: [550, 49.8, 13.9, 41.9], longi545: [545, 49.5, 13.8, 41.6] };
-    let c = db[document.getElementById('panelDb').value];
+    let c = db[document.getElementById('pSel').value];
     if(c) {
         ['pWp','pVoc','pIsc','pVmp'].forEach((id, i) => document.getElementById(id).value = c[i]);
     }
 }
 
-async function runValidation() {
-    const v = (id) => parseFloat(document.getElementById(id).value) || 0;
+function calculate() {
+    const g = (id) => parseFloat(document.getElementById(id).value) || 0;
     
-    // Engineering Validation
-    const sysKWp = (v('pWp') * v('pQty')) / 1000;
-    const strVoc = v('pVoc') * v('pStr');
-    const strVmp = v('pVmp') * v('pStr');
-    
-    // Validations
-    const voltOk = strVoc < v('invMaxV');
-    const mpptOk = strVmp > v('invMinMppt') && strVmp < v('invMaxMppt');
-    const currOk = v('pIsc') <= v('invMaxI');
+    const size = (g('pWp') * g('pQty')) / 1000;
+    const voc = g('pVoc') * g('pStr');
+    const vmp = g('pVmp') * g('pStr');
+    const isc = g('pIsc');
 
-    // HSP Thailand Fallback (Conservatively low for realistic calc)
-    const hsp = [5.0, 5.4, 5.7, 6.0, 5.3, 4.9, 4.7, 4.6, 4.5, 4.9, 5.0, 5.0];
-    const pr = 0.79; // Performance Ratio (Temp + Wire losses)
-    let monthlyGen = hsp.map(h => (h * sysKWp * pr * 30.4).toFixed(1));
-    let yearlySum = monthlyGen.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
-    let yearlySaving = yearlySum * 4.7;
+    // Efficiency Calc
+    const pr = 0.81; // System Performance Ratio
+    const yearlyKwh = size * 5.1 * 365 * pr;
+    const saving = yearlyKwh * 4.7;
+    const roi = g('totalCost') / saving;
 
-    const statusBadge = (b) => b ? '<span class="status-pill pass">PASS</span>' : '<span class="status-pill fail">DANGER</span>';
+    // UI Updates
+    document.getElementById('resSize').innerHTML = `${size.toFixed(2)} <small>kWp</small>`;
+    document.getElementById('resYield').innerHTML = `${Math.round(yearlyKwh).toLocaleString()} <small>kWh</small>`;
+    document.getElementById('resSave').innerText = `฿ ${Math.round(saving).toLocaleString()}`;
+    document.getElementById('resROI').innerHTML = `${roi.toFixed(1)} <small>Yrs</small>`;
 
-    document.getElementById('validate-panel').innerHTML = `
-        <h3 style="color:white; margin-bottom:10px;">Engineering Checks:</h3>
-        • System Capacity: ${sysKWp.toFixed(2)} kWp<br>
-        • String Voltage (Voc): ${strVoc.toFixed(1)} V ${statusBadge(voltOk)}<br>
-        • Operating Voltage (Vmp): ${strVmp.toFixed(1)} V ${statusBadge(mpptOk)}<br>
-        • Panel Current (Isc): ${v('pIsc')} A ${statusBadge(currOk)}<br>
-        <hr style="border:0; border-top:1px solid rgba(255,255,255,0.1); margin:15px 0;">
-        <h3 style="color:white; margin-bottom:10px;">Financial Forecast:</h3>
-        • Estimated Yield (Yr 1): ${yearlySum.toLocaleString()} kWh<br>
-        • Estimated Saving (Yr 1): ฿${yearlySaving.toLocaleString()}<br>
-        • ROI Payback Period: ${(v('totalCost')/yearlySaving).toFixed(1)} Years
+    // Validation Status
+    const vOk = voc < g('invMaxV');
+    const mOk = vmp > g('invMinM') && vmp < g('invMaxM');
+    const iOk = isc <= g('invMaxI');
+
+    document.getElementById('vResult').innerHTML = `
+        DC Voltage: ${voc.toFixed(1)}V <span class="status ${vOk?'status-pass':'status-fail'}">${vOk?'SAFE':'OVER'}</span><br>
+        MPPT Range: ${vmp.toFixed(1)}V <span class="status ${mOk?'status-pass':'status-fail'}">${mOk?'OK':'OUT'}</span><br>
+        Current: ${isc}A <span class="status ${iOk?'status-pass':'status-fail'}">${iOk?'SAFE':'LIMIT'}</span><br>
+        <hr style="border:0; border-top:1px solid rgba(255,255,255,0.1); margin:10px 0;">
+        Engineering Factor: PR 81% (Thai Standard)
     `;
 
-    lastResult = { sysKWp, strVoc, strVmp, yearlySum, yearlySaving, voltOk, mpptOk, currOk };
-    renderChart(yearlySum);
+    updateChart(yearlyKwh);
 }
 
-function renderChart(base) {
-    const ctx = document.getElementById('yieldChart').getContext('2d');
+function updateChart(base) {
+    const ctx = document.getElementById('mainChart').getContext('2d');
     if(chart) chart.destroy();
-    
-    // Degradation over 25 years (0.5% per year)
     let labels = [], data = [];
     for(let i=1; i<=25; i++) {
-        labels.push("Year " + i);
+        labels.push("Y" + i);
         data.push((base * Math.pow(0.995, i-1)).toFixed(0));
     }
-
     chart = new Chart(ctx, {
         type: 'line',
         data: {
             labels: labels,
             datasets: [{
-                label: 'kWh Production',
-                data: data,
-                borderColor: '#10b981',
-                backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                fill: true, tension: 0.4, borderWidth: 3, pointRadius: 2
+                label: 'Generation (kWh)', data: data,
+                borderColor: '#06b6d4', backgroundColor: 'rgba(6, 182, 212, 0.1)',
+                fill: true, tension: 0.4, borderWidth: 3, pointRadius: 0
             }]
         },
         options: {
             responsive: true, maintainAspectRatio: false,
             scales: {
-                y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#cbd5e1' } },
-                x: { grid: { display: false }, ticks: { color: '#cbd5e1' } }
+                y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8' } },
+                x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
             },
-            plugins: { legend: { labels: { color: 'white' } } }
+            plugins: { legend: { display: false } }
         }
     });
 }
 
 function exportPDF() {
-    if(!lastResult) return alert("โปรดกดคำนวณก่อนออกรายงาน");
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
-    const cust = document.getElementById('custName').value || "คุณลูกค้า";
-    const notes = document.getElementById('notes').value || "-";
-    const capex = parseFloat(document.getElementById('totalCost').value);
-
-    // Header
-    doc.setFillColor(15, 23, 42);
-    doc.rect(0, 0, 210, 45, 'F');
-    if(logoBase64) doc.addImage(logoBase64, 'PNG', 165, 8, 30, 30);
+    doc.setFillColor(30, 58, 138); // Blue Header
+    doc.rect(0, 0, 210, 40, 'F');
+    if(logoData) doc.addImage(logoData, 'PNG', 170, 5, 30, 30);
     
-    doc.setTextColor(16, 185, 129);
-    doc.setFontSize(22); doc.text("SOLAR ENGINEERING REPORT", 15, 25);
-    doc.setTextColor(255); doc.setFontSize(10); doc.text(`CLIENT: ${cust}`, 15, 35);
-
-    // Engineering Table
-    doc.setTextColor(0); doc.setFontSize(14); doc.text("1. Technical Validation", 15, 60);
+    doc.setTextColor(255);
+    doc.setFontSize(20); doc.text("SOLAR ENGINEERING MASTER REPORT", 15, 25);
+    
     doc.autoTable({
-        startY: 65,
-        head: [['Parameter', 'Value', 'Status']],
+        startY: 50,
+        head: [['Engineering Item', 'Calculated Value']],
         body: [
-            ['System Capacity', lastResult.sysKWp.toFixed(2) + ' kWp', 'VALID'],
-            ['String Voc', lastResult.strVoc.toFixed(1) + ' V', lastResult.voltOk ? 'PASS' : 'FAIL'],
-            ['String Vmp', lastResult.strVmp.toFixed(1) + ' V', lastResult.mpptOk ? 'NORMAL' : 'OUT'],
-            ['Annual Yield', lastResult.yearlySum.toLocaleString() + ' kWh', 'FORECAST']
+            ['Customer Name', document.getElementById('custName').value || 'Project Client'],
+            ['System Size', document.getElementById('resSize').innerText],
+            ['Yearly Energy Yield', document.getElementById('resYield').innerText],
+            ['Annual Saving', document.getElementById('resSave').innerText],
+            ['Payback Period', document.getElementById('resROI').innerText]
         ],
-        headStyles: {fillColor: [15, 23, 42]}
+        theme: 'striped', headStyles: {fillColor: [30, 58, 138]}
     });
-
-    // Financial Table
-    doc.text("2. Investment Analysis", 15, doc.lastAutoTable.finalY + 15);
-    doc.autoTable({
-        startY: doc.lastAutoTable.finalY + 20,
-        head: [['Metric', 'Value']],
-        body: [
-            ['Total Investment (CAPEX)', '฿' + capex.toLocaleString()],
-            ['Estimated Annual Saving', '฿' + lastResult.yearlySaving.toLocaleString()],
-            ['Payback Period', (capex / lastResult.yearlySaving).toFixed(1) + ' Years'],
-            ['Total 25-Year Saving', '฿' + (lastResult.yearlySaving * 25).toLocaleString()]
-        ],
-        headStyles: {fillColor: [16, 185, 129]}
-    });
-
-    // Notes
-    doc.text("3. หมายเหตุประกอบรายงาน", 15, doc.lastAutoTable.finalY + 15);
-    doc.setFontSize(10);
-    doc.text(doc.splitTextToSize(notes, 175), 15, doc.lastAutoTable.finalY + 25);
-
-    doc.save(`Solar_Pro_Report_${cust}.pdf`);
+    doc.save("Solar_Report.pdf");
 }
 </script>
 </body>
