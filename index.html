@@ -2,41 +2,89 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>⚡ Solar Engineer Tool</title>
 
 <style>
 body {
     font-family: Arial;
-    background: #0f172a;
+    background: linear-gradient(135deg, #0f172a, #020617);
     color: white;
-    text-align: center;
+    margin: 0;
     padding: 20px;
 }
+
 .container {
-    max-width: 700px;
+    max-width: 800px;
     margin: auto;
 }
+
+h1 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
 .box {
     background: #1e293b;
     padding: 20px;
-    border-radius: 12px;
+    border-radius: 15px;
     margin-bottom: 15px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.3);
 }
-input, select {
-    margin: 5px;
-    padding: 10px;
-    width: 90%;
-}
-button {
-    padding: 12px;
-    background: #22c55e;
-    border: none;
-    color: white;
-    cursor: pointer;
-    width: 95%;
-}
+
 h2 {
     color: #38bdf8;
+    margin-bottom: 10px;
+}
+
+/* INPUT GROUP */
+.input-group {
+    display: flex;
+    align-items: center;
+    margin: 6px 0;
+}
+
+.input-group input, .input-group select {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    outline: none;
+    border-radius: 8px 0 0 8px;
+}
+
+.input-group span {
+    background: #334155;
+    padding: 10px 12px;
+    border-radius: 0 8px 8px 0;
+    font-size: 14px;
+}
+
+/* BUTTON */
+button {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(90deg, #22c55e, #16a34a);
+    border: none;
+    color: white;
+    font-size: 16px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+button:hover {
+    transform: scale(1.02);
+}
+
+/* RESULT */
+.result {
+    line-height: 1.8;
+    font-size: 15px;
+}
+
+/* MOBILE */
+@media(max-width:600px){
+    body { padding: 10px; }
 }
 </style>
 </head>
@@ -47,43 +95,99 @@ h2 {
 
 <h1>⚡ Solar System Design Tool</h1>
 
+<!-- SOLAR -->
 <div class="box">
-<h2>☀️ Solar Input</h2>
-<input type="number" id="load" placeholder="โหลดไฟ (kWh/วัน)">
-<input type="number" id="sun" placeholder="Peak Sun Hour">
-<input type="number" id="panel" placeholder="กำลังแผง (W)">
-<input type="number" id="eff" placeholder="Efficiency (%) เช่น 80">
-<input type="number" id="stringSize" placeholder="แผง/สตริง เช่น 19">
+<h2>☀️ Solar</h2>
+
+<div class="input-group">
+<input type="number" id="load" placeholder="โหลดไฟ">
+<span>kWh/วัน</span>
 </div>
 
+<div class="input-group">
+<input type="number" id="sun" value="5" placeholder="Peak Sun Hour">
+<span>hr/day</span>
+</div>
+
+<div class="input-group">
+<input type="number" id="panel" value="535" placeholder="กำลังแผง">
+<span>W</span>
+</div>
+
+<div class="input-group">
+<input type="number" id="eff" value="80" placeholder="Efficiency">
+<span>%</span>
+</div>
+
+<div class="input-group">
+<input type="number" id="stringSize" value="19" placeholder="แผง/สตริง">
+<span>panel</span>
+</div>
+
+</div>
+
+<!-- SYSTEM -->
 <div class="box">
-<h2>🔋 Battery</h2>
+<h2>🔋 System</h2>
+
+<div class="input-group">
 <select id="systemType">
-  <option value="off">Off-grid</option>
-  <option value="on">On-grid</option>
-  <option value="hybrid">Hybrid</option>
+<option value="off">Off-grid</option>
+<option value="on">On-grid</option>
+<option value="hybrid">Hybrid</option>
 </select>
-<input type="number" id="voltage" placeholder="แรงดันแบต (12/24/48)">
-<input type="number" id="backup" placeholder="สำรองไฟ (ชั่วโมง)">
-<input type="number" id="dod" placeholder="DOD (%) เช่น 80">
+<span>mode</span>
 </div>
 
+<div class="input-group">
+<input type="number" id="voltage" value="48" placeholder="แรงดันแบต">
+<span>V</span>
+</div>
+
+<div class="input-group">
+<input type="number" id="backup" value="5" placeholder="สำรองไฟ">
+<span>hr</span>
+</div>
+
+<div class="input-group">
+<input type="number" id="dod" value="80" placeholder="DOD">
+<span>%</span>
+</div>
+
+</div>
+
+<!-- CABLE -->
 <div class="box">
 <h2>🔌 Cable</h2>
-<input type="number" id="distance" placeholder="ระยะสาย (เมตร)">
+
+<div class="input-group">
+<input type="number" id="distance" value="20" placeholder="ระยะสาย">
+<span>m</span>
 </div>
 
+</div>
+
+<!-- FINANCE -->
 <div class="box">
 <h2>💰 Financial</h2>
-<input type="number" id="price" placeholder="ค่าไฟ (บาท/kWh)">
-<input type="number" id="cost" placeholder="ค่าติดตั้ง (บาท)">
+
+<div class="input-group">
+<input type="number" id="price" value="4" placeholder="ค่าไฟ">
+<span>บาท/kWh</span>
+</div>
+
+<div class="input-group">
+<input type="number" id="cost" placeholder="ค่าติดตั้ง">
+<span>บาท</span>
+</div>
+
 </div>
 
 <button onclick="calc()">⚡ คำนวณระบบ</button>
 
 <div class="box">
 <h2>📊 Result</h2>
-<p id="result"></p>
+<div class="result" id="result"></div>
 </div>
 
 </div>
@@ -91,7 +195,6 @@ h2 {
 <script>
 function calc() {
 
-// ===== INPUT =====
 let load = +document.getElementById("load").value;
 let sun = +document.getElementById("sun").value;
 let panel = +document.getElementById("panel").value;
@@ -146,22 +249,22 @@ let roi = cost / saving;
 // ===== RESULT =====
 document.getElementById("result").innerHTML =
 
-"☀️ ระบบ: " + systemType + "<br><br>" +
+"☀️ ระบบ: <b>" + systemType.toUpperCase() + "</b><br><br>" +
 
 "🔋 Solar<br>" +
-"ขนาดระบบ: " + systemKW.toFixed(2) + " kW<br>" +
-"จำนวนแผง: " + Math.ceil(panels) + "<br>" +
-"จำนวน String: " + Math.ceil(strings) + "<br><br>" +
+"ขนาด: " + systemKW.toFixed(2) + " kW<br>" +
+"แผง: " + Math.ceil(panels) + "<br>" +
+"String: " + Math.ceil(strings) + "<br><br>" +
 
 (systemType !== "on" ?
 "🔋 Battery<br>" +
 "ความจุ: " + batteryAh.toFixed(0) + " Ah<br>" +
-"จำนวนแบต (100Ah): " + Math.ceil(batteryCount) + "<br><br>"
+"แบต 100Ah: " + Math.ceil(batteryCount) + "<br><br>"
 : "") +
 
 "⚡ Inverter<br>" +
 "ขนาด: " + inverterKW.toFixed(2) + " kW<br>" +
-"กระแส AC: " + acCurrent.toFixed(2) + " A<br><br>" +
+"กระแส: " + acCurrent.toFixed(2) + " A<br><br>" +
 
 "🔌 Cable<br>" +
 "DC: " + dcCable.toFixed(2) + " sq.mm<br>" +
