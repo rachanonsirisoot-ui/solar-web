@@ -2,67 +2,87 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Solar Calculator</title>
+<title>⚡ Solar System Design</title>
+
 <style>
-    body {
-        font-family: Arial;
-        background: #0f172a;
-        color: white;
-        text-align: center;
-        padding: 50px;
-    }
-    .box {
-        background: #1e293b;
-        padding: 20px;
-        border-radius: 12px;
-        max-width: 400px;
-        margin: auto;
-    }
-    input {
-        width: 80%;
-        padding: 10px;
-        margin: 10px;
-        border-radius: 8px;
-        border: none;
-    }
-    button {
-        padding: 10px 20px;
-        border: none;
-        border-radius: 8px;
-        background: #22c55e;
-        color: white;
-        font-size: 16px;
-        cursor: pointer;
-    }
+body {
+    font-family: Arial;
+    background: #0f172a;
+    color: white;
+    text-align: center;
+    padding: 40px;
+}
+.box {
+    background: #1e293b;
+    padding: 20px;
+    border-radius: 12px;
+    max-width: 450px;
+    margin: auto;
+}
+input {
+    margin: 5px;
+    padding: 8px;
+    width: 90%;
+}
+button {
+    padding: 10px;
+    background: #22c55e;
+    border: none;
+    color: white;
+    cursor: pointer;
+}
 </style>
 </head>
+
 <body>
 
-<h1>⚡ Solar Calculator</h1>
+<h1>⚡ Solar System Design Calculator</h1>
 
 <div class="box">
-    <input type="number" id="panels" placeholder="จำนวนแผง">
-    <input type="number" id="wp" placeholder="กำลังต่อแผง (Wp)">
-    <br>
-    <button onclick="calculate()">คำนวณ</button>
 
-    <h2 id="result"></h2>
+<input type="number" id="load" placeholder="โหลดไฟ (kWh/วัน)">
+<input type="number" id="sun" placeholder="ค่าแดด (Peak Sun Hour)">
+<input type="number" id="panel" placeholder="กำลังแผง (W)">
+<input type="number" id="price" placeholder="ค่าไฟ (บาท/kWh)">
+<input type="number" id="cost" placeholder="ค่าติดตั้ง (บาท)">
+
+<br>
+<button onclick="calc()">คำนวณ</button>
+
+<h2 id="result"></h2>
+
 </div>
 
 <script>
-function calculate() {
-    let panels = document.getElementById("panels").value;
-    let wp = document.getElementById("wp").value;
+function calc() {
 
-    let totalKW = (panels * wp) / 1000;
-    let daily = totalKW * 4.5;
-    let yearly = daily * 365;
+let load = document.getElementById("load").value;
+let sun = document.getElementById("sun").value;
+let panel = document.getElementById("panel").value;
+let price = document.getElementById("price").value;
+let cost = document.getElementById("cost").value;
 
-    document.getElementById("result").innerHTML =
-        "กำลังรวม: " + totalKW.toFixed(2) + " kW<br>" +
-        "ผลิต/วัน: " + daily.toFixed(2) + " kWh<br>" +
-        "ผลิต/ปี: " + yearly.toFixed(0) + " kWh";
+// ขนาดระบบ (kW)
+let systemKW = load / sun;
+
+// จำนวนแผง
+let panels = (systemKW * 1000) / panel;
+
+// พลังงานต่อปี
+let yearly = load * 365;
+
+// เงินที่ประหยัดได้/ปี
+let saving = yearly * price;
+
+// ROI (ปี)
+let roi = cost / saving;
+
+document.getElementById("result").innerHTML =
+"🔋 ขนาดระบบ: " + systemKW.toFixed(2) + " kW<br>" +
+"☀️ จำนวนแผง: " + Math.ceil(panels) + " แผง<br>" +
+"⚡ พลังงาน/ปี: " + yearly.toFixed(0) + " kWh<br>" +
+"💰 ประหยัด/ปี: " + saving.toFixed(0) + " บาท<br>" +
+"📈 คืนทุน: " + roi.toFixed(1) + " ปี";
 }
 </script>
 
