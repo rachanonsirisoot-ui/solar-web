@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Solar Calculator</title>
+<style>
+    body {
+        font-family: Arial;
+        background: #0f172a;
+        color: white;
+        text-align: center;
+        padding: 50px;
+    }
+    .box {
+        background: #1e293b;
+        padding: 20px;
+        border-radius: 12px;
+        max-width: 400px;
+        margin: auto;
+    }
+    input {
+        width: 80%;
+        padding: 10px;
+        margin: 10px;
+        border-radius: 8px;
+        border: none;
+    }
+    button {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 8px;
+        background: #22c55e;
+        color: white;
+        font-size: 16px;
+        cursor: pointer;
+    }
+</style>
+</head>
+<body>
+
+<h1>⚡ Solar Calculator</h1>
+
+<div class="box">
+    <input type="number" id="panels" placeholder="จำนวนแผง">
+    <input type="number" id="wp" placeholder="กำลังต่อแผง (Wp)">
+    <br>
+    <button onclick="calculate()">คำนวณ</button>
+
+    <h2 id="result"></h2>
+</div>
+
+<script>
+function calculate() {
+    let panels = document.getElementById("panels").value;
+    let wp = document.getElementById("wp").value;
+
+    let totalKW = (panels * wp) / 1000;
+    let daily = totalKW * 4.5;
+    let yearly = daily * 365;
+
+    document.getElementById("result").innerHTML =
+        "กำลังรวม: " + totalKW.toFixed(2) + " kW<br>" +
+        "ผลิต/วัน: " + daily.toFixed(2) + " kWh<br>" +
+        "ผลิต/ปี: " + yearly.toFixed(0) + " kWh";
+}
+</script>
+
+</body>
+</html>
