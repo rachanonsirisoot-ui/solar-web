@@ -3,47 +3,27 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>⚡ Solar Simulation Tool (Pro)</title>
+<title>⚡ Solar Pro Tool</title>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <style>
-body {
-    font-family: Arial;
-    background: #0f172a;
-    color: white;
-    padding: 20px;
-}
-.container { max-width: 900px; margin:auto; }
-.box {
-    background:#1e293b;
-    padding:15px;
-    border-radius:12px;
-    margin-bottom:10px;
-}
-.input-group { display:flex; margin:5px 0; }
-.input-group input, select {
-    flex:1; padding:10px; border:none;
-}
-.input-group span {
-    background:#334155;
-    padding:10px;
-}
-button {
-    width:100%;
-    padding:12px;
-    background:#22c55e;
-    border:none;
-    color:white;
-}
-canvas { background:white; border-radius:10px; }
+body { font-family: Arial; background:#0f172a; color:white; padding:15px;}
+.container { max-width:900px; margin:auto;}
+.box { background:#1e293b; padding:15px; border-radius:12px; margin-bottom:10px;}
+.input-group { display:flex; margin:5px 0;}
+.input-group input, select { flex:1; padding:10px; border:none;}
+.input-group span { background:#334155; padding:10px;}
+button { width:100%; padding:12px; background:#22c55e; border:none; color:white; margin-top:5px;}
+canvas { background:white; border-radius:10px;}
 </style>
 </head>
 
 <body>
 <div class="container">
 
-<h1>⚡ Solar Simulation Tool</h1>
+<h1>⚡ Solar Engineering Tool PRO++</h1>
 
 <div class="box">
 <h2>🌍 Location</h2>
@@ -52,17 +32,26 @@ canvas { background:white; border-radius:10px; }
 </div>
 
 <div class="box">
-<h2>☀️ System</h2>
-<div class="input-group"><input id="panel" value="535"><span>W</span></div>
+<h2>☀️ Panel</h2>
+<div class="input-group"><input id="panelPower" value="535"><span>W</span></div>
+<div class="input-group"><input id="voc" value="45"><span>Voc (V)</span></div>
+<div class="input-group"><input id="isc" value="14"><span>Isc (A)</span></div>
+<div class="input-group"><input id="stringSize" value="19"><span>Panel/String</span></div>
+</div>
+
+<div class="box">
+<h2>⚙️ Design</h2>
 <div class="input-group"><input id="area" value="1000"><span>m²</span></div>
 <div class="input-group"><input id="eff" value="80"><span>%</span></div>
+<div class="input-group"><input id="tilt" value="15"><span>Tilt°</span></div>
+<div class="input-group"><input id="azimuth" value="180"><span>Azimuth°</span></div>
 </div>
 
 <div class="box">
 <h2>⚡ Loss</h2>
-<div class="input-group"><input id="tempLoss" value="5"><span>% Temp</span></div>
-<div class="input-group"><input id="soilingLoss" value="3"><span>% Dust</span></div>
-<div class="input-group"><input id="invLoss" value="4"><span>% Inverter</span></div>
+<div class="input-group"><input id="tempLoss" value="5"><span>%</span></div>
+<div class="input-group"><input id="dustLoss" value="3"><span>%</span></div>
+<div class="input-group"><input id="invLoss" value="4"><span>%</span></div>
 </div>
 
 <div class="box">
@@ -72,15 +61,10 @@ canvas { background:white; border-radius:10px; }
 </div>
 
 <button onclick="calc()">⚡ Run Simulation</button>
+<button onclick="exportPDF()">📄 Export PDF</button>
 
-<div class="box">
-<h2>📊 Result</h2>
-<div id="result"></div>
-</div>
-
-<div class="box">
-<canvas id="chart"></canvas>
-</div>
+<div class="box"><div id="result"></div></div>
+<div class="box"><canvas id="chart"></canvas></div>
 
 </div>
 
@@ -93,77 +77,93 @@ let data = await res.json();
 return data.properties.parameter.ALLSKY_SFC_SW_DWN;
 }
 
+let globalResult = "";
+
 async function calc(){
 
-let lat = document.getElementById("lat").value;
-let lon = document.getElementById("lon").value;
+let lat = +lat.value;
+let lon = +lon.value;
 
-let panel = document.getElementById("panel").value;
-let area = document.getElementById("area").value;
-let eff = document.getElementById("eff").value/100;
+let panelPower = +panelPower.value;
+let voc = +voc.value;
+let isc = +isc.value;
+let stringSize = +stringSize.value;
 
-let tempLoss = document.getElementById("tempLoss").value/100;
-let soilingLoss = document.getElementById("soilingLoss").value/100;
-let invLoss = document.getElementById("invLoss").value/100;
+let area = +area.value;
+let eff = +eff.value/100;
+let tilt = +tilt.value;
+let azimuth = +azimuth.value;
 
-let price = document.getElementById("price").value;
-let cost = document.getElementById("cost").value;
+let tempLoss = +tempLoss.value/100;
+let dustLoss = +dustLoss.value/100;
+let invLoss = +invLoss.value/100;
 
-// ===== NASA DATA =====
+let price = +price.value;
+let cost = +cost.value;
+
+// ===== NASA =====
 let solar = await getSolar(lat, lon);
 
-// ===== MONTHLY CALC =====
 let months = Object.keys(solar);
 let energyMonthly = [];
-
 let totalYear = 0;
 
-months.forEach(m => {
+months.forEach(m=>{
+let irr = solar[m];
 
-let irr = solar[m]; // kWh/m2/day
+// Tilt effect (approx)
+let tiltFactor = 1 + (tilt-10)/100;
 
-let energy = irr * area * eff;
+let energy = irr * area * eff * tiltFactor;
 
-// Loss
-energy *= (1 - tempLoss);
-energy *= (1 - soilingLoss);
-energy *= (1 - invLoss);
+energy *= (1-tempLoss)*(1-dustLoss)*(1-invLoss);
 
 energyMonthly.push(energy.toFixed(0));
 totalYear += energy;
-
 });
 
-// ===== PR =====
-let PR = (1 - tempLoss - soilingLoss - invLoss);
+// ===== STRING CHECK =====
+let stringVoltage = voc * stringSize;
+let stringCurrent = isc;
+
+let voltageStatus = stringVoltage < 1000 ? "OK" : "⚠️ Over Voltage";
+let currentStatus = stringCurrent < 15 ? "OK" : "⚠️ Over Current";
+
+// ===== INVERTER AUTO =====
+let inverterKW = totalYear/365/5;
+let inverterSuggest = Math.ceil(inverterKW/10)*10;
 
 // ===== FINANCE =====
 let saving = totalYear * price;
 let roi = cost / saving;
 
 // ===== RESULT =====
-document.getElementById("result").innerHTML =
+globalResult =
+`Energy/year: ${totalYear.toFixed(0)} kWh
+PR: ${((1-tempLoss-dustLoss-invLoss)*100).toFixed(1)} %
+Voltage: ${stringVoltage.toFixed(0)} V (${voltageStatus})
+Current: ${stringCurrent.toFixed(1)} A (${currentStatus})
+Inverter: ${inverterSuggest} kW
+Saving: ${saving.toFixed(0)} บาท/ปี
+ROI: ${roi.toFixed(1)} ปี`;
 
-"📍 Location: " + lat + ", " + lon + "<br><br>" +
-
-"⚡ Annual Energy: " + totalYear.toFixed(0) + " kWh<br>" +
-"📈 PR: " + (PR*100).toFixed(1) + "%<br>" +
-
-"💰 Saving/year: " + saving.toFixed(0) + " บาท<br>" +
-"⏳ ROI: " + roi.toFixed(1) + " ปี";
+document.getElementById("result").innerText = globalResult;
 
 // ===== CHART =====
-new Chart(document.getElementById("chart"), {
-type: 'bar',
-data: {
-labels: months,
-datasets: [{
-label: 'kWh/month',
-data: energyMonthly
-}]
-}
+new Chart(chart, {
+type:'line',
+data:{ labels:months, datasets:[{label:"kWh", data:energyMonthly}] }
 });
 
+}
+
+// ===== PDF =====
+function exportPDF(){
+const { jsPDF } = window.jspdf;
+let doc = new jsPDF();
+doc.text("Solar Report", 10,10);
+doc.text(globalResult,10,20);
+doc.save("solar-report.pdf");
 }
 
 </script>
