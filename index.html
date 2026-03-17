@@ -1,19 +1,111 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>⚡ Solar Engineer Tool</title>
+
+<style>
+body {
+    font-family: Arial;
+    background: #0f172a;
+    color: white;
+    text-align: center;
+    padding: 20px;
+}
+.container {
+    max-width: 700px;
+    margin: auto;
+}
+.box {
+    background: #1e293b;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 15px;
+}
+input, select {
+    margin: 5px;
+    padding: 10px;
+    width: 90%;
+}
+button {
+    padding: 12px;
+    background: #22c55e;
+    border: none;
+    color: white;
+    cursor: pointer;
+    width: 95%;
+}
+h2 {
+    color: #38bdf8;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>⚡ Solar System Design Tool</h1>
+
+<div class="box">
+<h2>☀️ Solar Input</h2>
+<input type="number" id="load" placeholder="โหลดไฟ (kWh/วัน)">
+<input type="number" id="sun" placeholder="Peak Sun Hour">
+<input type="number" id="panel" placeholder="กำลังแผง (W)">
+<input type="number" id="eff" placeholder="Efficiency (%) เช่น 80">
+<input type="number" id="stringSize" placeholder="แผง/สตริง เช่น 19">
+</div>
+
+<div class="box">
+<h2>🔋 Battery</h2>
+<select id="systemType">
+  <option value="off">Off-grid</option>
+  <option value="on">On-grid</option>
+  <option value="hybrid">Hybrid</option>
+</select>
+<input type="number" id="voltage" placeholder="แรงดันแบต (12/24/48)">
+<input type="number" id="backup" placeholder="สำรองไฟ (ชั่วโมง)">
+<input type="number" id="dod" placeholder="DOD (%) เช่น 80">
+</div>
+
+<div class="box">
+<h2>🔌 Cable</h2>
+<input type="number" id="distance" placeholder="ระยะสาย (เมตร)">
+</div>
+
+<div class="box">
+<h2>💰 Financial</h2>
+<input type="number" id="price" placeholder="ค่าไฟ (บาท/kWh)">
+<input type="number" id="cost" placeholder="ค่าติดตั้ง (บาท)">
+</div>
+
+<button onclick="calc()">⚡ คำนวณระบบ</button>
+
+<div class="box">
+<h2>📊 Result</h2>
+<p id="result"></p>
+</div>
+
+</div>
+
+<script>
 function calc() {
 
 // ===== INPUT =====
-let load = document.getElementById("load").value;
-let sun = document.getElementById("sun").value;
-let panel = document.getElementById("panel").value;
-let price = document.getElementById("price").value;
-let cost = document.getElementById("cost").value;
+let load = +document.getElementById("load").value;
+let sun = +document.getElementById("sun").value;
+let panel = +document.getElementById("panel").value;
+let eff = +document.getElementById("eff").value / 100;
+let stringSize = +document.getElementById("stringSize").value;
 
-let voltage = document.getElementById("voltage").value;
-let backup = document.getElementById("backup").value;
-let dod = document.getElementById("dod").value / 100;
+let voltage = +document.getElementById("voltage").value;
+let backup = +document.getElementById("backup").value;
+let dod = +document.getElementById("dod").value / 100;
 
-let distance = document.getElementById("distance").value;
-let stringSize = document.getElementById("stringSize").value;
-let eff = document.getElementById("eff").value / 100;
+let distance = +document.getElementById("distance").value;
+
+let price = +document.getElementById("price").value;
+let cost = +document.getElementById("cost").value;
 
 let systemType = document.getElementById("systemType").value;
 
@@ -23,17 +115,25 @@ let panels = (systemKW * 1000) / panel;
 let strings = panels / stringSize;
 
 // ===== BATTERY =====
-let batteryAh = (load * 1000 * backup) / (voltage * dod);
-let batteryCount = batteryAh / 100; // สมมุติแบต 100Ah
+let batteryAh = 0;
+let batteryCount = 0;
+
+if(systemType !== "on") {
+    batteryAh = (load * 1000 * backup) / (voltage * dod);
+    batteryCount = batteryAh / 100;
+}
 
 // ===== INVERTER =====
 let inverterKW = systemKW * 1.2;
 let acCurrent = (inverterKW * 1000) / 230;
 
 // ===== CABLE =====
-let vdropDC = voltage * 0.03;
-let dcCurrent = (systemKW * 1000) / voltage;
-let dcCable = (2 * distance * dcCurrent) / (56 * vdropDC);
+let dcCable = 0;
+if(systemType !== "on") {
+    let dcCurrent = (systemKW * 1000) / voltage;
+    let vdropDC = voltage * 0.03;
+    dcCable = (2 * distance * dcCurrent) / (56 * vdropDC);
+}
 
 let vdropAC = 230 * 0.03;
 let acCable = (2 * distance * acCurrent) / (56 * vdropAC);
@@ -45,16 +145,19 @@ let roi = cost / saving;
 
 // ===== RESULT =====
 document.getElementById("result").innerHTML =
+
 "☀️ ระบบ: " + systemType + "<br><br>" +
 
 "🔋 Solar<br>" +
-"ขนาด: " + systemKW.toFixed(2) + " kW<br>" +
+"ขนาดระบบ: " + systemKW.toFixed(2) + " kW<br>" +
 "จำนวนแผง: " + Math.ceil(panels) + "<br>" +
-"String: " + Math.ceil(strings) + "<br><br>" +
+"จำนวน String: " + Math.ceil(strings) + "<br><br>" +
 
+(systemType !== "on" ?
 "🔋 Battery<br>" +
 "ความจุ: " + batteryAh.toFixed(0) + " Ah<br>" +
-"จำนวนแบต (100Ah): " + Math.ceil(batteryCount) + "<br><br>" +
+"จำนวนแบต (100Ah): " + Math.ceil(batteryCount) + "<br><br>"
+: "") +
 
 "⚡ Inverter<br>" +
 "ขนาด: " + inverterKW.toFixed(2) + " kW<br>" +
@@ -68,3 +171,7 @@ document.getElementById("result").innerHTML =
 "ประหยัด/ปี: " + saving.toFixed(0) + " บาท<br>" +
 "คืนทุน: " + roi.toFixed(1) + " ปี";
 }
+</script>
+
+</body>
+</html>
