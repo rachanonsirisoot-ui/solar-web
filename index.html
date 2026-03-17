@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>⚡ Solar Master Suite v14.0</title>
+    <title>⚡ Solar Master Pro Suite - Integrated NASA Data</title>
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -15,248 +15,250 @@
         @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Kanit:wght@300;500;700&display=swap');
 
         :root { 
-            --deep-blue: #0f172a; --accent: #06b6d4; --glass: rgba(15, 23, 42, 0.9);
-            --success: #10b981; --danger: #ef4444;
+            --deep-blue: #0f172a; --accent: #06b6d4; --success: #10b981; 
+            --danger: #ef4444; --card-bg: rgba(30, 41, 59, 0.7);
         }
 
         body { 
             margin: 0; padding: 20px; font-family: 'Kanit', sans-serif; color: #f1f5f9;
-            background: linear-gradient(var(--glass), var(--glass)), url('image_0.png');
+            background: linear-gradient(rgba(15,23,42,0.9), rgba(15,23,42,0.9)), url('image_0.png');
             background-size: cover; background-attachment: fixed;
         }
 
-        .container { max-width: 1500px; margin: auto; }
-        .panel { 
-            background: var(--glass); backdrop-filter: blur(10px); 
-            border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; padding: 25px; margin-bottom: 25px;
-        }
-
-        h2 { color: var(--accent); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1.5px; margin: 0 0 20px 0; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
-
-        .layout { display: grid; grid-template-columns: 380px 1fr; gap: 25px; }
-        .dashboard-top { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 25px; }
-
-        /* Stats Card */
-        .stat-card { background: rgba(30, 58, 138, 0.3); border-radius: 18px; padding: 20px; text-align: center; border: 1px solid rgba(255,255,255,0.05); }
-        .stat-val { font-family: 'JetBrains Mono'; font-size: 1.8rem; display: block; color: #fff; }
-        .stat-lbl { font-size: 0.75rem; color: #94a3b8; margin-top: 5px; text-transform: uppercase; }
-
-        /* Form */
-        label { display: block; font-size: 0.7rem; color: #94a3b8; margin-bottom: 5px; font-weight: bold; }
-        .field { 
-            display: flex; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.15); 
-            border-radius: 10px; overflow: hidden; margin-bottom: 15px; transition: 0.3s;
-        }
-        .field:focus-within { border-color: var(--accent); }
-        .field input, .field select { flex: 1; background: transparent; border: none; color: white; padding: 12px; outline: none; font-size: 0.95rem; font-family: 'JetBrains Mono'; }
-        .field span { background: rgba(255,255,255,0.05); padding: 12px; font-size: 0.7rem; color: #64748b; border-left: 1px solid rgba(255,255,255,0.1); min-width: 40px; text-align: center; }
-
-        /* Buttons */
-        .btn { padding: 18px; border-radius: 14px; border: none; font-weight: bold; cursor: pointer; text-transform: uppercase; transition: 0.3s; width: 100%; font-size: 0.9rem; }
-        .btn-main { background: var(--accent); color: var(--deep-blue); margin-top: 10px; }
-        .btn-pdf { background: transparent; border: 1px solid rgba(255,255,255,0.2); color: white; margin-top: 10px; }
-        .btn:hover { transform: translateY(-3px); filter: brightness(1.2); }
-
-        #map { height: 320px; border-radius: 18px; border: 1px solid var(--accent); margin-bottom: 15px; }
-        .chart-container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .container { max-width: 1600px; margin: auto; }
+        .grid-layout { display: grid; grid-template-columns: 400px 1fr 350px; gap: 20px; }
         
-        .v-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.85rem; }
+        .panel { 
+            background: var(--card-bg); backdrop-filter: blur(12px); 
+            border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; padding: 20px;
+        }
+
+        h2 { font-size: 0.8rem; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; border-left: 3px solid var(--accent); padding-left: 10px; }
+
+        /* Stats Bar */
+        .top-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 20px; }
+        .stat-box { background: var(--card-bg); padding: 15px; border-radius: 15px; text-align: center; border: 1px solid rgba(255,255,255,0.05); }
+        .stat-box span { display: block; font-family: 'JetBrains Mono'; font-size: 1.5rem; font-weight: bold; }
+        .stat-box label { font-size: 0.7rem; color: #94a3b8; }
+
+        /* Map & Inputs */
+        #map { height: 250px; border-radius: 12px; margin-bottom: 10px; border: 1px solid var(--accent); }
+        .field-group { margin-bottom: 12px; }
+        .field-group label { display: block; font-size: 0.7rem; color: #94a3b8; margin-bottom: 4px; }
+        .input-wrap { display: flex; background: rgba(0,0,0,0.3); border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); overflow: hidden; }
+        .input-wrap input, .input-wrap select { flex: 1; background: transparent; border: none; color: white; padding: 10px; outline: none; font-family: 'JetBrains Mono'; }
+        .input-wrap span { background: rgba(255,255,255,0.05); padding: 10px; font-size: 0.7rem; color: #64748b; min-width: 45px; text-align: center; }
+
+        /* Table & Lists */
+        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+        th { text-align: left; color: var(--accent); padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        td { padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+
+        .btn { width: 100%; padding: 15px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 10px; }
+        .btn-calc { background: var(--accent); color: var(--deep-blue); }
+        .btn-pdf { background: transparent; border: 1px solid var(--accent); color: var(--accent); }
+        .btn:hover { transform: translateY(-2px); filter: brightness(1.1); }
+
+        #loading-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 9999; flex-direction: column; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
 
+<div id="loading-overlay">
+    <div style="border: 4px solid #f3f3f3; border-top: 4px solid var(--accent); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite;"></div>
+    <p style="margin-top: 15px;">📡 Fetching NASA Solar Data...</p>
+</div>
+
 <div class="container">
-    <header style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:30px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:10px;">
-        <h1 style="margin:0; font-weight:800; font-size:1.8rem;">SOLAR <span style="color:var(--accent)">MASTER</span> SUITE</h1>
-        <div style="text-align:right; font-size:0.75rem; color:#94a3b8;">PRODUCTION & ENGINEERING ANALYTICS</div>
+    <header style="margin-bottom: 25px;">
+        <h1 style="margin:0; font-weight:800; font-size:1.8rem;">SOLAR <span style="color:var(--accent)">MASTER</span> PRO <small style="font-size:0.8rem; color:#64748b;">v14.0 NASA AI Integrated</small></h1>
     </header>
 
-    <div class="dashboard-top">
-        <div class="stat-card"><span class="stat-lbl">System Size</span><span class="stat-val" id="resSize">0.00</span><small>kWp</small></div>
-        <div class="stat-card"><span class="stat-lbl">Yearly Energy</span><span class="stat-val" id="resYield">0</span><small>kWh</small></div>
-        <div class="stat-card"><span class="stat-lbl">Yearly Saving</span><span class="stat-val" id="resSave">฿ 0</span></div>
-        <div class="stat-card"><span class="stat-lbl">Payback ROI</span><span class="stat-val" id="resROI">0.0</span><small>Years</small></div>
+    <div class="top-stats">
+        <div class="stat-box"><span id="resSize">0.00</span><label>kWp System Size</label></div>
+        <div class="stat-box"><span id="resYield">0</span><label>Annual kWh</label></div>
+        <div class="stat-box"><span id="resSave">฿ 0</span><label>Annual Saving</label></div>
+        <div class="stat-box"><span id="resROI">0.0</span><label>Years Payback</label></div>
     </div>
 
-    <div class="layout">
+    <div class="grid-layout">
         <aside>
             <div class="panel">
-                <h2>🛰️ SITE LOCATION</h2>
+                <h2>📍 Site & Location</h2>
                 <div id="map"></div>
-                <div style="font-size:0.75rem; color:var(--accent); text-align:center;" id="coords">13.7500, 100.5000</div>
-            </div>
-
-            <div class="panel">
-                <h2>🛠️ SYSTEM CONFIG</h2>
-                <label>Module Model</label>
-                <div class="field">
-                    <select id="pSel" onchange="applyPreset()">
-                        <option value="custom">-- Custom Manual --</option>
-                        <option value="jinko550">Jinko Tiger Pro 550W</option>
-                        <option value="longi545">LONGi Hi-MO 5 545W</option>
-                    </select>
-                </div>
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                    <div><label>Pmax (Wp)</label><div class="field"><input id="pWp" value="550"></div></div>
-                    <div><label>Voc (V)</label><div class="field"><input id="pVoc" value="49.8"></div></div>
+                    <div class="field-group"><label>Lat</label><div class="input-wrap"><input id="lat" value="13.75"></div></div>
+                    <div class="field-group"><label>Lon</label><div class="input-wrap"><input id="lon" value="100.5"></div></div>
                 </div>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                    <div><label>Quantity</label><div class="field"><input id="pQty" value="20"></div></div>
-                    <div><label>S/String</label><div class="field"><input id="pStr" value="10"></div></div>
-                </div>
-                <label>Inverter Max Vdc</label>
-                <div class="field"><input id="invMaxV" value="1100"><span>V</span></div>
                 
-                <button class="btn btn-main" onclick="calculate()">🚀 CALCULATE ANALYSIS</button>
-                <button class="btn btn-pdf" onclick="exportPDF()">📄 EXPORT PDF REPORT</button>
+                <h2>☀️ Array Spec</h2>
+                <div class="field-group"><label>Panel Watt (Wp)</label><div class="input-wrap"><input id="pWp" value="550"><span>Wp</span></div></div>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                    <div class="field-group"><label>Total Qty</label><div class="input-wrap"><input id="pQty" value="20"></div></div>
+                    <div class="field-group"><label>S/String</label><div class="input-wrap"><input id="pStr" value="10"></div></div>
+                </div>
+                <div class="field-group"><label>Cost Budget</label><div class="input-wrap"><input id="pCost" value="350000"><span>THB</span></div></div>
+
+                <button class="btn btn-calc" onclick="calculateAll()">⚡ RUN NASA SIMULATION</button>
+                <button class="btn btn-pdf" onclick="generatePDF()">📄 EXPORT REPORT</button>
             </div>
         </aside>
 
         <main>
-            <div class="panel">
-                <h2>📊 MONTHLY PERFORMANCE (JAN - DEC)</h2>
-                <div class="chart-container">
-                    <div style="height:350px;"><canvas id="chartMonthly"></canvas></div>
-                    <div style="height:350px;"><canvas id="chartHsp"></canvas></div>
-                </div>
+            <div class="panel" style="margin-bottom: 20px;">
+                <h2>📊 Monthly Energy Production (kWh)</h2>
+                <div style="height: 350px;"><canvas id="yieldChart"></canvas></div>
             </div>
-
-            <div class="panel" style="display:grid; grid-template-columns: 1fr 1fr; gap:25px;">
-                <div>
-                    <h2>🛡️ ENGINEERING LOGS</h2>
-                    <div id="vLogs">
-                        <div class="v-row"><span>Voltage Safety</span><span style="color:var(--success)">PASS ✅</span></div>
-                        <div class="v-row"><span>MPPT Range Check</span><span style="color:var(--success)">OPTIMAL ✅</span></div>
-                        <div class="v-row"><span>Thailand Loss Factor</span><span>12% Temp Loss</span></div>
-                    </div>
-                </div>
-                <div>
-                    <h2>📈 25-YEAR YIELD PROJECTION</h2>
-                    <div style="height:200px;"><canvas id="chartLongTerm"></canvas></div>
-                </div>
+            <div class="panel">
+                <h2>📈 NASA Solar Irradiation (HSP)</h2>
+                <div style="height: 200px;"><canvas id="hspChart"></canvas></div>
             </div>
         </main>
+
+        <aside>
+            <div class="panel" style="margin-bottom: 20px;">
+                <h2>📦 Bill of Materials</h2>
+                <div id="bom-table">
+                    <table>
+                        <tr><th>Equipment</th><th>Qty</th></tr>
+                        <tr><td>Loading items...</td><td>-</td></tr>
+                    </table>
+                </div>
+            </div>
+            <div class="panel">
+                <h2>🛡️ Engineering Check</h2>
+                <div id="eng-logs" style="font-size: 0.8rem;">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                        <span>DC/AC Ratio</span><span id="logRatio">-</span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                        <span>System Loss</span><span>18% (Std)</span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between;">
+                        <span>Source</span><span style="color:var(--success)">NASA POWER API</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
     </div>
 </div>
 
+<style> @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } } </style>
+
 <script>
-let map, marker, charts = {};
-// Peak Sun Hours (HSP) Thailand Average
-const HSP_DATA = [4.8, 5.2, 5.8, 6.1, 5.4, 4.9, 4.7, 4.6, 4.8, 5.1, 4.9, 4.7];
-const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+let map, marker, yieldChart, hspChart;
+let globalResult = {};
 
 window.onload = () => {
     map = L.map('map', {zoomControl: false}).setView([13.75, 100.5], 6);
     L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);
     marker = L.marker([13.75, 100.5], {draggable: true}).addTo(map);
     
-    map.on('click', e => updateMarker(e.latlng.lat, e.latlng.lng));
-    marker.on('dragend', () => updateMarker(marker.getLatLng().lat, marker.getLatLng().lng));
+    map.on('click', e => updateCoords(e.latlng.lat, e.latlng.lng));
+    marker.on('dragend', () => updateCoords(marker.getLatLng().lat, marker.getLatLng().lng));
     
-    calculate();
+    calculateAll();
 };
 
-function updateMarker(lat, lng) {
+function updateCoords(lat, lng) {
     marker.setLatLng([lat, lng]);
-    document.getElementById('coords').innerText = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+    document.getElementById('lat').value = lat.toFixed(4);
+    document.getElementById('lon').value = lng.toFixed(4);
 }
 
-function applyPreset() {
-    const db = { jinko550: [550, 49.8], longi545: [545, 49.5] };
-    const val = db[document.getElementById('pSel').value];
-    if(val) {
-        document.getElementById('pWp').value = val[0];
-        document.getElementById('pVoc').value = val[1];
+async function calculateAll() {
+    document.getElementById('loading-overlay').style.display = 'flex';
+    
+    const lat = document.getElementById('lat').value;
+    const lon = document.getElementById('lon').value;
+    const pWp = parseFloat(document.getElementById('pWp').value);
+    const pQty = parseFloat(document.getElementById('pQty').value);
+    const pCost = parseFloat(document.getElementById('pCost').value);
+    const kwp = (pWp * pQty) / 1000;
+
+    try {
+        // Fetch NASA Data
+        const res = await fetch(`https://power.larc.nasa.gov/api/temporal/monthly/point?parameters=ALLSKY_SFC_SW_DWN&community=RE&longitude=${lon}&latitude=${lat}&format=JSON`);
+        const data = await res.json();
+        const solarData = Object.values(data.properties.parameter.ALLSKY_SFC_SW_DWN).slice(0, 12);
+        
+        const labels = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+        let monthlyYield = [];
+        let totalYield = 0;
+
+        solarData.forEach((hsp, i) => {
+            const days = new Date(2024, i + 1, 0).getDate();
+            const energy = hsp * kwp * 0.81 * days; // 0.81 = System PR
+            monthlyYield.push(energy.toFixed(0));
+            totalYield += energy;
+        });
+
+        const saving = totalYield * 4.7;
+        const roi = pCost / saving;
+
+        // Update UI
+        document.getElementById('resSize').innerText = kwp.toFixed(2);
+        document.getElementById('resYield').innerText = Math.round(totalYield).toLocaleString();
+        document.getElementById('resSave').innerText = "฿ " + Math.round(saving).toLocaleString();
+        document.getElementById('resROI').innerText = roi.toFixed(1);
+
+        renderCharts(labels, monthlyYield, solarData);
+        renderBOM(pQty);
+        
+        globalResult = { kwp, totalYield, saving, roi, monthlyYield, solarData };
+        
+    } catch (e) {
+        alert("API Error: ไม่สามารถเชื่อมต่อฐานข้อมูล NASA ได้");
+    } finally {
+        document.getElementById('loading-overlay').style.display = 'none';
     }
 }
 
-function calculate() {
-    const pWp = parseFloat(document.getElementById('pWp').value) || 0;
-    const pQty = parseFloat(document.getElementById('pQty').value) || 0;
-    const pVoc = parseFloat(document.getElementById('pVoc').value) || 0;
-    const pStr = parseFloat(document.getElementById('pStr').value) || 0;
-    
-    const sysKWp = (pWp * pQty) / 1000;
-    const vocTotal = pVoc * pStr;
-    const pr = 0.81; // 81% Efficiency factor for Thailand
-
-    // Monthly Yield Calc
-    const monthlyYield = HSP_DATA.map(hsp => hsp * sysKWp * pr * 30.4);
-    const annualTotal = monthlyYield.reduce((a, b) => a + b, 0);
-    const saving = annualTotal * 4.7;
-
-    // Update UI
-    document.getElementById('resSize').innerText = sysKWp.toFixed(2);
-    document.getElementById('resYield').innerText = Math.round(annualTotal).toLocaleString();
-    document.getElementById('resSave').innerText = "฿ " + Math.round(saving).toLocaleString();
-    document.getElementById('resROI').innerText = (350000 / saving).toFixed(1); // Demo cost
-
-    // Validation
-    const vocOk = vocTotal < parseFloat(document.getElementById('invMaxV').value);
-    document.getElementById('vLogs').innerHTML = `
-        <div class="v-row"><span>Voc Total (Max ${document.getElementById('invMaxV').value}V)</span><span style="color:${vocOk?'var(--success)':'var(--danger)'}">${vocTotal.toFixed(1)}V ${vocOk?'✅':'❌'}</span></div>
-        <div class="v-row"><span>Degradation (Year 1-25)</span><span>0.5% / Year</span></div>
-        <div class="v-row"><span>HSP Method</span><span>Thai Standard Met.</span></div>
-    `;
-
-    renderCharts(monthlyYield);
-}
-
-function renderCharts(yieldData) {
-    const commonOpt = {
-        responsive: true, maintainAspectRatio: false,
-        plugins: { legend: { labels: { color: '#94a3b8', font: { family: 'Kanit' } } } },
-        scales: { 
-            y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#64748b' } },
-            x: { grid: { display: false }, ticks: { color: '#64748b' } }
-        }
-    };
-
-    // 1. Energy Bar Chart
-    if(charts.mon) charts.mon.destroy();
-    charts.mon = new Chart(document.getElementById('chartMonthly'), {
+function renderCharts(labels, yieldData, hspData) {
+    const ctx1 = document.getElementById('yieldChart').getContext('2d');
+    if(yieldChart) yieldChart.destroy();
+    yieldChart = new Chart(ctx1, {
         type: 'bar',
-        data: { labels: MONTHS, datasets: [{ label: 'Energy (kWh)', data: yieldData, backgroundColor: '#06b6d4', borderRadius: 6 }] },
-        options: commonOpt
+        data: { labels, datasets: [{ label: 'Monthly Energy (kWh)', data: yieldData, backgroundColor: '#06b6d4', borderRadius: 5 }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
     });
 
-    // 2. HSP Line Chart
-    if(charts.hsp) charts.hsp.destroy();
-    charts.hsp = new Chart(document.getElementById('chartHsp'), {
+    const ctx2 = document.getElementById('hspChart').getContext('2d');
+    if(hspChart) hspChart.destroy();
+    hspChart = new Chart(ctx2, {
         type: 'line',
-        data: { labels: MONTHS, datasets: [{ label: 'Solar HSP', data: HSP_DATA, borderColor: '#10b981', tension: 0.4 }] },
-        options: commonOpt
-    });
-
-    // 3. 25 Year Forecast
-    if(charts.long) charts.long.destroy();
-    let longData = [];
-    let base = yieldData.reduce((a, b) => a + b, 0);
-    for(let i=1; i<=25; i++) longData.push((base * Math.pow(0.995, i-1)).toFixed(0));
-    
-    charts.long = new Chart(document.getElementById('chartLongTerm'), {
-        type: 'line',
-        data: { labels: Array.from({length: 25}, (_, i) => i + 1), datasets: [{ label: 'kWh/Year', data: longData, borderColor: '#6366f1', fill: true, backgroundColor: 'rgba(99, 102, 241, 0.1)', pointRadius: 0 }] },
-        options: commonOpt
+        data: { labels, datasets: [{ label: 'NASA HSP', data: hspData, borderColor: '#10b981', fill: true, backgroundColor: 'rgba(16,185,129,0.1)', tension: 0.4 }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
     });
 }
 
-function exportPDF() {
+function renderBOM(qty) {
+    document.getElementById('bom-table').innerHTML = `
+        <table>
+            <tr><td>PV Modules</td><td>${qty} Pcs</td></tr>
+            <tr><td>On-Grid Inverter</td><td>1 Set</td></tr>
+            <tr><td>Smart Meter + CT</td><td>1 Set</td></tr>
+            <tr><td>Mounting Rails</td><td>1 Lot</td></tr>
+            <tr><td>DC/AC Cabling</td><td>1 Lot</td></tr>
+        </table>
+    `;
+}
+
+function generatePDF() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
-    doc.setFillColor(15, 23, 42); doc.rect(0, 0, 210, 40, 'F');
-    doc.setTextColor(6, 182, 212); doc.setFontSize(22); doc.text("SOLAR ENGINEERING MASTER REPORT", 15, 25);
+    doc.text("Solar Master Professional Report", 20, 20);
     doc.autoTable({
-        startY: 50,
-        head: [['Specification', 'Result']],
+        startY: 30,
+        head: [['Metric', 'Value']],
         body: [
-            ['System Capacity', document.getElementById('resSize').innerText + ' kWp'],
-            ['Annual Yield', document.getElementById('resYield').innerText + ' kWh'],
-            ['Coordinates', document.getElementById('coords').innerText]
-        ],
-        headStyles: {fillColor: [30, 58, 138]}
+            ['System Size', globalResult.kwp + ' kWp'],
+            ['Annual Yield', Math.round(globalResult.totalYield) + ' kWh'],
+            ['Annual Saving', 'THB ' + Math.round(globalResult.saving)],
+            ['Payback', globalResult.roi.toFixed(1) + ' Years']
+        ]
     });
-    doc.save("Solar_Master_Report.pdf");
+    doc.save("Solar_Master_Final.pdf");
 }
 </script>
 </body>
