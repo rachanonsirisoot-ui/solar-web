@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>⚡ Solar Pro Engineering Suite | Full Version</title>
+    <title>⚡ Solar Pro | Ultra Stable Version</title>
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -11,146 +11,152 @@
 
     <style>
         :root { --primary: #10b981; --secondary: #6366f1; --bg: #0f172a; --card: #1e293b; --text: #f1f5f9; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); padding: 20px; margin: 0; }
-        .container { max-width: 1200px; margin: auto; }
-        .card { background: var(--card); padding: 20px; border-radius: 12px; border: 1px solid #334155; margin-bottom: 20px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; }
-        .input-group { margin-bottom: 12px; }
-        .input-group label { display: block; font-size: 0.8rem; color: #94a3b8; margin-bottom: 5px; }
-        .field { display: flex; background: #0f172a; border-radius: 6px; border: 1px solid #475569; overflow: hidden; }
-        .field input { flex: 1; background: transparent; border: none; color: white; padding: 8px; outline: none; text-align: right; }
-        .field span { background: #334155; padding: 8px; font-size: 0.8rem; min-width: 50px; text-align: center; }
-        button { width: 100%; padding: 15px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; margin-bottom: 10px; }
-        .btn-calc { background: var(--primary); color: #064e3b; }
-        .btn-pdf { background: var(--secondary); color: white; }
-        #result-display { background: #020617; padding: 15px; border-radius: 8px; font-family: monospace; border-left: 4px solid var(--primary); white-space: pre-wrap; }
-        canvas { background: white; border-radius: 8px; margin-top: 15px; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); padding: 20px; margin: 0; }
+        .container { max-width: 1100px; margin: auto; }
+        .card { background: var(--card); padding: 25px; border-radius: 16px; border: 1px solid #334155; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        h1 { color: var(--primary); text-align: center; font-size: 2rem; }
+        
+        .field-label { font-size: 0.85rem; color: #94a3b8; margin-bottom: 5px; }
+        .input-box { display: flex; background: #0f172a; border-radius: 8px; border: 1px solid #475569; overflow: hidden; margin-bottom: 15px; }
+        .input-box input { flex: 1; background: transparent; border: none; color: white; padding: 12px; outline: none; }
+        .input-box span { background: #334155; padding: 12px; font-size: 0.8rem; min-width: 60px; text-align: center; }
+
+        .btn-group { display: flex; gap: 15px; margin: 20px 0; }
+        button { flex: 1; padding: 16px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; font-size: 1rem; }
+        .btn-main { background: var(--primary); color: #064e3b; }
+        .btn-alt { background: var(--secondary); color: white; }
+        button:hover { filter: brightness(1.2); transform: translateY(-2px); }
+
+        #result { background: #020617; padding: 20px; border-radius: 12px; font-family: 'Consolas', monospace; border-left: 5px solid var(--primary); line-height: 1.8; color: #5eead4; }
+        canvas { background: white; border-radius: 12px; padding: 15px; margin-top: 20px; width: 100% !important; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>⚡ Solar Pro <span style="color:var(--primary)">Engineering</span></h1>
-    
+    <h1>⚡ Solar Engineering <span style="color:white">Pro++</span></h1>
+
     <div class="grid">
         <div class="card">
-            <h3>🌍 Location & Panel</h3>
-            <div class="input-group"><label>Lat / Lon</label>
-                <div class="field"><input id="lat" value="13.75"><input id="lon" value="100.5"></div>
-            </div>
-            <div class="input-group"><label>Panel Wattage</label>
-                <div class="field"><input id="pWp" value="550"><span>Wp</span></div>
-            </div>
-            <div class="input-group"><label>Total Panels / String Size</label>
-                <div class="field"><input id="pQty" value="20"><input id="pStr" value="10"></div>
-            </div>
+            <h3 style="color: var(--primary)">☀️ System Spec</h3>
+            <div class="field-label">ขนาดแผง (Wp)</div>
+            <div class="input-box"><input id="pWp" value="550"><span>Wp</span></div>
+            <div class="field-label">จำนวนแผง (Total)</div>
+            <div class="input-box"><input id="pQty" value="20"><span>แผง</span></div>
+            <div class="field-label">Voc ต่อแผง / จำนวนแผงต่อ String</div>
+            <div class="input-box"><input id="pVoc" value="49.8"><input id="pStr" value="10"></div>
         </div>
 
         <div class="card">
-            <h3>⚙️ System & Finance</h3>
-            <div class="input-group"><label>Roof Tilt / Azimuth</label>
-                <div class="field"><input id="tilt" value="15"><input id="azi" value="180"></div>
-            </div>
-            <div class="input-group"><label>Project Cost</label>
-                <div class="field"><input id="cost" value="350000"><span>฿</span></div>
-            </div>
-            <div class="input-group"><label>Electricity Price</label>
-                <div class="field"><input id="ePrice" value="4.7"><span>฿/unit</span></div>
-            </div>
+            <h3 style="color: var(--primary)">🌍 Site & Finance</h3>
+            <div class="field-label">พิกัด Lat / Lon</div>
+            <div class="input-box"><input id="lat" value="13.75"><input id="lon" value="100.5"></div>
+            <div class="field-label">งบประมาณโครงการ</div>
+            <div class="input-box"><input id="cost" value="350000"><span>บาท</span></div>
+            <div class="field-label">ค่าไฟฟ้าเฉลี่ย</div>
+            <div class="input-box"><input id="ePrice" value="4.7"><span>฿/หน่วย</span></div>
         </div>
     </div>
 
-    <div class="grid" style="grid-template-columns: 2fr 1fr;">
-        <button class="btn-calc" onclick="runApp()">⚡ เริ่มคำนวณ (Run Simulation)</button>
-        <button class="btn-pdf" onclick="exportPDF()">📄 Export PDF</button>
+    <div class="btn-group">
+        <button class="btn-main" onclick="startSim()">⚡ ประมวลผลจำลองการผลิต</button>
+        <button class="btn-alt" onclick="savePDF()">📄 ออกรายงาน PDF</button>
     </div>
 
     <div class="grid">
         <div class="card">
-            <h3>📊 ผลการวิเคราะห์</h3>
-            <div id="result-display">กดปุ่มคำนวณเพื่อเริ่ม...</div>
+            <h3 style="color: var(--primary)">📋 ผลการวิเคราะห์</h3>
+            <div id="result">ยังไม่มีข้อมูล...</div>
         </div>
         <div class="card">
-            <h3>📈 รายได้รายเดือน</h3>
-            <canvas id="yieldChart" height="200"></canvas>
+            <h3 style="color: var(--primary)">📈 กราฟการผลิตรายเดือน</h3>
+            <canvas id="mainChart"></canvas>
         </div>
     </div>
 </div>
 
 <script>
-let chartInstance = null;
-let savedData = null;
+let myChart = null;
+let reportData = {};
 
-async function runApp() {
-    const v = (id) => parseFloat(document.getElementById(id).value);
-    const systemSize = (v('pWp') * v('pQty')) / 1000;
+async function startSim() {
+    const getVal = (id) => parseFloat(document.getElementById(id).value);
     
-    let hspData = [];
+    const systemKWp = (getVal('pWp') * getVal('pQty')) / 1000;
+    const stringVoc = getVal('pVoc') * getVal('pStr');
     
+    let monthlyYield = [];
+    let yearlySum = 0;
+    const labels = ["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."];
+
     try {
-        // ดึงข้อมูลจาก NASA
-        const url = `https://power.larc.nasa.gov/api/temporal/monthly/point?parameters=ALLSKY_SFC_SW_DWN&community=RE&longitude=${v('lon')}&latitude=${v('lat')}&format=JSON`;
+        // ดึงข้อมูล NASA
+        const url = `https://power.larc.nasa.gov/api/temporal/monthly/point?parameters=ALLSKY_SFC_SW_DWN&community=RE&longitude=${getVal('lon')}&latitude=${getVal('lat')}&format=JSON`;
         const res = await fetch(url);
-        if(!res.ok) throw new Error();
+        if (!res.ok) throw new Error("API Error");
         const data = await res.json();
         const raw = data.properties.parameter.ALLSKY_SFC_SW_DWN;
-        hspData = Object.values(raw).slice(0, 12);
-    } catch (e) {
-        console.warn("NASA API Error, using Thai average fallback.");
-        // กรณี API ล่ม: ใช้ค่าเฉลี่ยแสงแดดในไทย (ประมาณ 4.5 - 5.5 HSP)
-        hspData = [5.1, 5.4, 5.8, 5.9, 5.2, 4.8, 4.7, 4.6, 4.5, 4.9, 5.0, 5.0];
+        const hspValues = Object.values(raw).slice(0, 12);
+
+        hspValues.forEach((hsp, i) => {
+            let energy = hsp * systemKWp * 0.8 * new Date(2024, i+1, 0).getDate();
+            monthlyYield.push(energy.toFixed(1));
+            yearlySum += energy;
+        });
+        console.log("Using Real NASA Data");
+
+    } catch (err) {
+        // --- Fallback Data ถ้า API ล่ม ---
+        console.warn("Using Fallback Thai Average Data");
+        const fallbackHSP = [5.1, 5.4, 5.8, 6.0, 5.2, 4.8, 4.7, 4.6, 4.5, 4.9, 5.1, 5.0];
+        fallbackHSP.forEach((hsp, i) => {
+            let energy = hsp * systemKWp * 0.8 * new Date(2024, i+1, 0).getDate();
+            monthlyYield.push(energy.toFixed(1));
+            yearlySum += energy;
+        });
+        alert("⚠️ หมายเหตุ: ไม่สามารถเชื่อมต่อ NASA ได้ ระบบใช้ค่าเฉลี่ยแสงในไทยแทน");
     }
 
-    let monthlyKwh = [];
-    let yearlyKwh = 0;
-    const months = ["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."];
+    const saving = yearlySum * getVal('ePrice');
+    const roi = getVal('cost') / saving;
 
-    hspData.forEach((hsp, i) => {
-        const days = new Date(2024, i + 1, 0).getDate();
-        const gen = hsp * systemSize * 0.8 * days; // 0.8 คือ Efficiency รวม (Inverter + Temp + Dust)
-        monthlyKwh.push(gen.toFixed(1));
-        yearlyKwh += gen;
-    });
+    // อัปเดตข้อความ
+    document.getElementById('result').innerHTML = 
+        `ขนาดติดตั้ง: ${systemKWp.toFixed(2)} kWp\n` +
+        `ผลิตไฟฟ้าได้: ${yearlySum.toLocaleString(undefined,{maximumFractionDigits:0})} หน่วย/ปี\n` +
+        `ประหยัดเงิน: ${saving.toLocaleString(undefined,{maximumFractionDigits:0})} บาท/ปี\n` +
+        `จุดคุ้มทุน: ${roi.toFixed(1)} ปี\n` +
+        `แรงดัน String: ${stringVoc.toFixed(1)} V ${stringVoc > 1000 ? '<br><b style="color:red">⚠️ อันตราย: Volt เกิน!</b>' : ''}`;
 
-    const yearlySaving = yearlyKwh * v('ePrice');
-    const payback = v('cost') / yearlySaving;
-
-    // แสดงผล
-    document.getElementById('result-display').innerHTML = 
-        `ขนาดระบบ: ${systemSize.toFixed(2)} kWp\n` +
-        `ผลิตไฟฟ้าได้: ${yearlyKwh.toLocaleString(undefined, {maximumFractionDigits:0})} หน่วย/ปี\n` +
-        `ประหยัดเงิน: ${yearlySaving.toLocaleString(undefined, {maximumFractionDigits:0})} บาท/ปี\n` +
-        `จุดคุ้มทุน: ${payback.toFixed(2)} ปี\n` +
-        `ลดก๊าซ CO2: ${(yearlyKwh * 0.51).toFixed(2)} kg/ปี`;
-
-    updateChart(months, monthlyKwh);
-    savedData = { systemSize, yearlyKwh, yearlySaving, payback, monthlyKwh };
+    // อัปเดตกราฟ
+    renderChart(labels, monthlyYield);
+    reportData = { systemKWp, yearlySum, saving, roi, monthlyYield };
 }
 
-function updateChart(labels, data) {
-    const ctx = document.getElementById('yieldChart');
-    if(chartInstance) chartInstance.destroy();
-    chartInstance = new Chart(ctx, {
+function renderChart(labels, data) {
+    const ctx = document.getElementById('mainChart').getContext('2d');
+    if (myChart) myChart.destroy();
+    myChart = new Chart(ctx, {
         type: 'bar',
         data: {
             labels: labels,
-            datasets: [{ label: 'kWh', data: data, backgroundColor: '#10b981' }]
+            datasets: [{ label: 'พลังงานที่ผลิตได้ (kWh)', data: data, backgroundColor: '#10b981' }]
         },
-        options: { responsive: true, maintainAspectRatio: false }
+        options: { responsive: true, scales: { y: { beginAtZero: true } } }
     });
 }
 
-function exportPDF() {
-    if(!savedData) return alert("กรุณากดคำนวณก่อน");
+function savePDF() {
+    if (!reportData.yearlySum) return alert("กรุณากดคำนวณก่อน!");
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
-    doc.setFontSize(20);
-    doc.text("Solar Report Summary", 20, 20);
-    doc.setFontSize(12);
-    doc.text(`Capacity: ${savedData.systemSize} kWp`, 20, 40);
-    doc.text(`Annual Yield: ${savedData.yearlyKwh.toFixed(0)} kWh`, 20, 50);
-    doc.text(`Payback: ${savedData.payback.toFixed(2)} Years`, 20, 60);
-    doc.save("solar-pro-report.pdf");
+    doc.text("Solar Engineering Report Summary", 20, 20);
+    doc.text(`System Size: ${reportData.systemKWp} kWp`, 20, 40);
+    doc.text(`Annual Energy: ${reportData.yearlySum.toFixed(0)} kWh`, 20, 50);
+    doc.text(`Annual Saving: ${reportData.saving.toFixed(0)} THB`, 20, 60);
+    doc.text(`Payback: ${reportData.roi.toFixed(1)} Years`, 20, 70);
+    doc.save("solar-report.pdf");
 }
 </script>
 </body>
